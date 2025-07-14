@@ -1,5 +1,5 @@
 #!/bin/bash
-# 同步新闻文件的脚本
+# 同步新闻文件的脚本 - 适配新报纸风格模板
 
 set -euo pipefail
 
@@ -52,13 +52,15 @@ if [ -d "source-news/summaries" ]; then
                             # 读取到 {{CONTENT}} 之前的内容
                             sed '/{{CONTENT}}/q' "$dest_dir/_index.md.tmp" | sed '$d'
                             
-                            # 插入日报链接
+                            # 插入日报链接 - 新格式
                             for date_str in $all_dates; do
                                 if [ -n "$date_str" ]; then
                                     year_part="${date_str:0:4}"
                                     month_part="${date_str:4:2}"
                                     day_part="${date_str:6:2}"
-                                    echo "  <li><a href=\"${year_part}-${month_part}-${day_part}\">${month_part}-${day_part}-简报</a></li>"
+                                    echo "<div class=\"daily-article\">"
+                                    echo "  <a href=\"${year_part}-${month_part}-${day_part}\">${month_part}-${day_part} 日报</a>"
+                                    echo "</div>"
                                 fi
                             done
                             
@@ -142,21 +144,30 @@ EOF
             year="${dirname:0:4}"
             month="${dirname:5:2}"
             
-            # 生成月份卡片
-            month_cards="${month_cards}  {{< card link=\"${dirname}\" title=\"${year}年${month}月\" icon=\"calendar\" >}}\n"
+            # 统计该月文章数量
+            article_count=$(find "$month_dir" -name "*.md" -not -name "_index.md" | wc -l || echo 0)
+            
+            # 生成新格式的月份卡片
+            month_cards="${month_cards}<div class=\"month-card\">\n"
+            month_cards="${month_cards}  <h3><a href=\"${dirname}\">${year}年${month}月</a></h3>\n"
+            month_cards="${month_cards}  <p>收录 ${article_count} 篇AI日报，涵盖技术突破、产业动态、投资并购等关键资讯</p>\n"
+            month_cards="${month_cards}</div>\n"
         fi
     done
     
     # 如果没有任何月份数据，显示暂无数据提示
     if [ -z "$month_cards" ]; then
-        month_cards="  {{< callout type=\"info\" >}}\n  暂无日报数据\n  {{< /callout >}}\n"
+        month_cards="<div class=\"no-data-card\">\n"
+        month_cards="${month_cards}  <h3>暂无日报数据</h3>\n"
+        month_cards="${month_cards}  <p>AI每日简报正在筹备中，敬请期待...</p>\n"
+        month_cards="${month_cards}</div>\n"
     fi
     
     # 使用模板生成首页
     home_template=".github/templates/home-index.md"
     if [ -f "$home_template" ]; then
         sed "s|{{MONTH_CARDS}}|$month_cards|g" "$home_template" | sed '/^$/N;/\n$/d' > "content/_index.md"
-        echo "Generated home page with $(echo -e "$month_cards" | wc -l) months"
+        echo "Generated home page with $(echo -e "$month_cards" | wc -l) month cards"
     else
         echo "Warning: Home template not found: $home_template"
     fi
