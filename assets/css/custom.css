@@ -293,3 +293,33 @@ footer .hx-max-w-screen-xl{max-width:100%}
   background:rgba(0,0,0,.6);
   border-color:rgba(255,255,255,.1);
 }
+
+/*──────── 手机端列表压缩 & Flex 对齐 ────────*/
+@media (max-width: 768px) {
+  /* 1) 让条目变成横向 flex，文字和期号左右排布 */
+  .newspaper-articles-grid > div {
+    display: flex;
+    align-items: center;           /* 垂直居中 */
+    justify-content: space-between;
+    padding: 0.75rem 1rem 0.75rem 1rem; /* 上下更紧凑，左边与竖线对齐 */
+  }
+
+  /* 2) 文字块占满剩余宽度 */
+  .newspaper-articles-grid a {
+    flex: 1 1 auto;
+  }
+
+  /* 3) 移动端 hover 不明显，增加按压反馈 */
+  .newspaper-articles-grid > div:active {
+    transform: translateX(1px);
+    box-shadow: inset 4px 0 0 var(--newspaper-accent);
+    transition: none;              /* 避免闪白 */
+  }
+
+  /* 4) 因为 padding 改小，左侧📅图标位置微调 */
+  .newspaper-articles-grid > div::before {
+    left: -0.35rem;
+    top: 0.95rem;
+  }
+}
+
