@@ -3,7 +3,7 @@
 # 
 # 功能：从ai-news-vault仓库同步markdown文件并生成Hugo站点内容
 # 作者：AI每日简报团队
-# 版本：2.2 - 修复算术运算导致的退出问题
+# 版本：2.3 - 优化标题生成，避免重复
 
 set -euo pipefail
 
@@ -103,7 +103,7 @@ collect_month_dates() {
         done
 }
 
-# 生成日报页面
+# 生成日报页面 - 优化版本，避免标题重复
 generate_daily_page() {
     local month_dir="$1"
     local dest_dir="$2"
@@ -115,12 +115,14 @@ generate_daily_page() {
     
     local merged_file="${dest_dir}/${year}-${month}-${day}.md"
     
-    # 生成前置数据
+    # 生成前置数据 - 添加自定义字段
     cat > "$merged_file" << FILE_EOF
 ---
 title: "${month}-${day}-简报"
 weight: $day_weight
 date: ${year}-${month}-${day}
+description: "AI每日简报 - ${year}年${month}月${day}日行业动态"
+toc: true
 ---
 
 FILE_EOF
@@ -144,13 +146,13 @@ FILE_EOF
             filename="$(basename "$file")"
             
             # 提取时间戳 (HHMMSS)
-            if [[ "$filename" =~ summary_[0-9]{8}_([0-9]{6])\.md$ ]]; then
+            if [[ "$filename" =~ summary_[0-9]{8}_([0-9]{6})\.md$ ]]; then
                 local timestamp="${BASH_REMATCH[1]}"
                 local hour="${timestamp:0:2}"
                 local minute="${timestamp:2:2}"
                 
                 {
-                    echo "## ${hour}:${minute} 更新"
+                    echo "### ${hour}:${minute} 更新"
                     echo ""
                     cat "$file"
                     echo ""
@@ -370,7 +372,7 @@ sync_content() {
 # =============================================================================
 
 main() {
-    log "AI News Content Sync v2.2"
+    log "AI News Content Sync v2.3"
     log "Project root: $PROJECT_ROOT"
     log "Source directory: $SOURCE_DIR"
     log "Content directory: $CONTENT_DIR"

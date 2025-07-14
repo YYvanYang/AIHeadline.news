@@ -90,162 +90,258 @@ footer .hx-max-w-screen-xl {
   color: #d1d5db;
 }
 
-/* 报纸风格基础样式 */
-.newspaper-layout {
-  background-color: var(--newspaper-bg);
-  color: var(--newspaper-text);
-  transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-/* 报纸标题样式 */
-.newspaper-masthead {
-  font-family: var(--font-headline);
-  text-align: center;
-  padding: 2rem 0;
-}
-
-.newspaper-masthead h1 {
-  font-weight: 900;
-  letter-spacing: -0.02em;
-  text-shadow: 2px 2px 4px var(--newspaper-shadow);
-}
-
-/* 经典报纸分栏效果 */
-.newspaper-columns {
-  column-count: 1;
-  column-gap: 2rem;
-  column-rule: 1px solid var(--newspaper-border);
-}
-
-@media (min-width: 768px) {
-  .newspaper-columns {
-    column-count: 2;
-  }
-}
-
-@media (min-width: 1024px) {
-  .newspaper-columns {
-    column-count: 3;
-  }
-}
-
-/* 文章卡片样式 */
-.article-card {
-  background: var(--newspaper-bg);
-  border: 2px solid var(--newspaper-border);
-  box-shadow: 4px 4px 0 var(--newspaper-border);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  break-inside: avoid;
-  margin-bottom: 1.5rem;
-  padding: 1.5rem;
-}
-
-.article-card:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 6px 6px 0 var(--newspaper-border);
-}
-
-/* 标题层次系统 */
-.headline-primary {
-  font-family: var(--font-headline);
-  font-size: clamp(2rem, 5vw, 4rem);
-  font-weight: 900;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
-  margin-bottom: 1rem;
-}
-
-.headline-secondary {
-  font-family: var(--font-headline);
-  font-size: clamp(1.5rem, 3vw, 2.5rem);
-  font-weight: 700;
+/* === 日报内容标题优化 === */
+/* 针对日报页面的第一个h2标题进行美化 */
+article[data-page-path*="2025-"] h2:first-of-type,
+article[data-page-path*="2026-"] h2:first-of-type,
+article[data-page-path*="2027-"] h2:first-of-type {
+  /* 报纸主标题样式 */
+  font-size: 2.5rem;
+  font-weight: 800;
   line-height: 1.2;
-  margin-bottom: 0.75rem;
-}
-
-.headline-tertiary {
+  margin-top: 0;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 4px double #1f2937;
   font-family: var(--font-headline);
-  font-size: clamp(1.25rem, 2.5vw, 1.75rem);
-  font-weight: 600;
-  line-height: 1.3;
-  margin-bottom: 0.5rem;
 }
 
-/* 正文样式 */
-.article-body {
-  font-family: var(--font-body);
-  font-size: 1rem;
-  line-height: 1.7;
-  text-align: justify;
-  hyphens: auto;
+/* 深色模式适配 */
+.dark article[data-page-path*="2025-"] h2:first-of-type,
+.dark article[data-page-path*="2026-"] h2:first-of-type,
+.dark article[data-page-path*="2027-"] h2:first-of-type {
+  border-bottom-color: #e5e7eb;
 }
 
-/* 首字母下沉效果 */
-.drop-cap::first-letter {
-  float: left;
-  font-family: var(--font-headline);
-  font-size: 4rem;
-  line-height: 3rem;
-  font-weight: 900;
+/* === 日报元信息样式 === */
+/* xAI发布Grok 4引发行业震动 部分添加日期标识 */
+article[data-page-path*="2025-"] h3:first-of-type::before,
+article[data-page-path*="2026-"] h3:first-of-type::before,
+article[data-page-path*="2027-"] h3:first-of-type::before {
+  content: "📅 ";
+  font-size: 1.2em;
   margin-right: 0.5rem;
-  margin-top: 0.25rem;
-  color: var(--newspaper-accent);
 }
 
-/* 引用样式 */
-.newspaper-quote {
+/* === 月份索引页优化 === */
+/* 日报列表项美化 */
+.daily-article {
   position: relative;
-  padding-left: 2rem;
-  margin: 2rem 0;
-  font-style: italic;
-  font-family: var(--font-headline);
-  border-left: 4px solid var(--newspaper-accent);
+  padding-left: 1.5rem;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+  margin-bottom: 0.5rem;
+  border-left: 3px solid #3b82f6;
+  transition: all 0.2s ease;
 }
 
-.newspaper-quote::before {
-  content: '"';
+.daily-article:hover {
+  background-color: rgba(59, 130, 246, 0.05);
+  border-left-width: 5px;
+  padding-left: 1.75rem;
+}
+
+.dark .daily-article:hover {
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
+.daily-article a {
+  color: inherit;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.daily-article a:hover {
+  color: #3b82f6;
+}
+
+/* === 首页月份卡片样式 === */
+.newspaper-grid > div {
+  border: 2px solid #111827;
+  padding: 1.5rem;
+  background-color: #ffffff;
+  box-shadow: 4px 4px 0 rgb(17 24 39);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.newspaper-grid > div:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 rgb(17 24 39);
+}
+
+.dark .newspaper-grid > div {
+  background-color: #111827;
+  border-color: #f3f4f6;
+  box-shadow: 4px 4px 0 rgb(243 244 246);
+}
+
+.dark .newspaper-grid > div:hover {
+  box-shadow: 6px 6px 0 rgb(243 244 246);
+}
+
+/* 卡片内容样式 */
+.newspaper-grid h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  font-family: var(--font-headline);
+  color: #111827;
+}
+
+.dark .newspaper-grid h3 {
+  color: #f3f4f6;
+}
+
+.newspaper-grid a {
+  color: #111827;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.dark .newspaper-grid a {
+  color: #f3f4f6;
+}
+
+.newspaper-grid a:hover {
+  color: #3b82f6;
+}
+
+.dark .newspaper-grid a:hover {
+  color: #60a5fa;
+}
+
+.newspaper-grid p {
+  color: #4b5563;
+  font-size: 0.875rem;
+  line-height: 1.625;
+}
+
+.dark .newspaper-grid p {
+  color: #9ca3af;
+}
+
+/* 添加报纸日期标记 */
+.newspaper-grid > div::before {
+  content: "📰";
   position: absolute;
-  left: -0.5rem;
-  top: -1rem;
-  font-size: 4rem;
-  color: var(--newspaper-accent);
-  opacity: 0.3;
-  font-family: var(--font-headline);
-}
-
-/* 分隔线样式 */
-.newspaper-divider {
-  margin: 2rem 0;
-  border: none;
-  height: 1px;
-  background: repeating-linear-gradient(
-    90deg,
-    transparent,
-    transparent 3px,
-    var(--newspaper-border) 3px,
-    var(--newspaper-border) 6px
-  );
+  top: -0.5rem;
+  right: -0.5rem;
+  font-size: 1.5rem;
 }
 
 /* 响应式调整 */
 @media (max-width: 768px) {
-  .newspaper-columns {
-    column-count: 1;
+  .newspaper-masthead h1 {
+    font-size: 2rem;
   }
   
-  .article-card {
-    margin-bottom: 1rem;
-    padding: 1rem;
+  .newspaper-masthead .grid {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
   }
   
-  .article-body {
-    text-align: left;
-    hyphens: none;
+  .newspaper-grid {
+    grid-template-columns: 1fr;
   }
   
-  .drop-cap::first-letter {
-    font-size: 3rem;
-    line-height: 2.5rem;
+  article[data-page-path*="2025-"] h2:first-of-type,
+  article[data-page-path*="2026-"] h2:first-of-type,
+  article[data-page-path*="2027-"] h2:first-of-type {
+    font-size: 1.875rem;
+  }
+}
+
+/* 月份索引页的文章列表样式 */
+.newspaper-articles-grid > div {
+  border-left: 4px solid #e5e7eb;
+  padding-left: 1.5rem;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+  position: relative;
+  background: linear-gradient(90deg, 
+    rgba(59, 130, 246, 0.02) 0%, 
+    rgba(59, 130, 246, 0.01) 20%, 
+    transparent 100%
+  );
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dark .newspaper-articles-grid > div {
+  border-left-color: #4b5563;
+  background: linear-gradient(90deg, 
+    rgba(59, 130, 246, 0.08) 0%, 
+    rgba(59, 130, 246, 0.02) 20%, 
+    transparent 100%
+  );
+}
+
+.newspaper-articles-grid > div:hover {
+  border-left-color: #3b82f6;
+  padding-left: 2rem;
+  background: linear-gradient(90deg, 
+    rgba(59, 130, 246, 0.1) 0%, 
+    rgba(59, 130, 246, 0.03) 30%, 
+    transparent 100%
+  );
+  transform: translateX(4px);
+}
+
+/* 日期标记 */
+.newspaper-articles-grid > div::before {
+  content: "📅";
+  position: absolute;
+  left: -0.5rem;
+  top: 1rem;
+  font-size: 1.125rem;
+  z-index: 1;
+}
+
+/* 链接样式 */
+.newspaper-articles-grid a {
+  color: #111827;
+  font-weight: 600;
+  font-size: 1.125rem;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  display: block;
+  font-family: var(--font-headline);
+}
+
+.dark .newspaper-articles-grid a {
+  color: #f3f4f6;
+}
+
+.newspaper-articles-grid a:hover {
+  color: #3b82f6;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.dark .newspaper-articles-grid a:hover {
+  color: #60a5fa;
+}
+
+/* 加载动画 */
+.newspaper-articles-grid > div {
+  opacity: 0;
+  animation: fadeInUp 0.6s ease forwards;
+}
+
+.newspaper-articles-grid > div:nth-child(1) { animation-delay: 0.1s; }
+.newspaper-articles-grid > div:nth-child(2) { animation-delay: 0.2s; }
+.newspaper-articles-grid > div:nth-child(3) { animation-delay: 0.3s; }
+.newspaper-articles-grid > div:nth-child(4) { animation-delay: 0.4s; }
+.newspaper-articles-grid > div:nth-child(5) { animation-delay: 0.5s; }
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -284,6 +380,11 @@ footer .hx-max-w-screen-xl {
   
   .article-card:hover {
     transform: none;
+  }
+  
+  .newspaper-articles-grid > div {
+    animation: none;
+    opacity: 1;
   }
 }
 
