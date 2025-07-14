@@ -420,12 +420,25 @@ footer .hx-max-w-screen-xl { max-width: 100%; }
 
 /*────────────────── 手机端列表压缩 & 间距优化 ──────────────────*/
 @media (max-width: 768px) {
-  /* Flex 排版 + 文字右移 4 px */
+  /* 标题字号缩减 */
+  .newspaper-masthead h1  { font-size: 2rem; }
+  .content h2:first-child { font-size: 1.875rem; }
+
+  /* 单列网格 */
+  .newspaper-grid,
+  .newspaper-masthead .grid { grid-template-columns: 1fr; }
+
+  /* 卡片/条目过渡更快 */
+  .daily-article,
+  .newspaper-grid > div,
+  .newspaper-articles-grid > div { transition-duration: var(--duration-fast); }
+
+  /* 日报条目：Flex 布局、间距加大 */
   .newspaper-articles-grid > div {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0.75rem 1rem 0.75rem 1.25rem;
+    padding: 0.75rem 1rem 0.75rem 1.5rem;   /* 左侧整体缩进 1.5rem */
   }
 
   .newspaper-articles-grid a { flex: 1 1 auto; }
@@ -437,9 +450,20 @@ footer .hx-max-w-screen-xl { max-width: 100%; }
     transition: none;
   }
 
-  /* 调整图标 / 竖线微偏移 */
-  .newspaper-articles-grid > div::before,
+  /* 📅 图标微左移，保持贴竖线 */
+  .newspaper-articles-grid > div::before { left: -0.6rem; }
+
+  /* 期号徽章更醒目、靠右一致 */
   .newspaper-articles-grid > div::after {
-    transform: translateX(0.25rem);
+    right: 0.5rem;               /* 离右缘 ≈12 px */
+    top: 0.75rem;                /* 与文字基线对齐 */
+    font-weight: 500;
+    background: rgba(49,130,206,.15);
+    border: 1px solid rgba(49,130,206,.35);
+    color: var(--newspaper-accent);
+  }
+  .dark .newspaper-articles-grid > div::after {
+    background: rgba(49,130,206,.30);
+    border-color: rgba(49,130,206,.55);
   }
 }
