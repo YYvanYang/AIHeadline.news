@@ -1,396 +1,316 @@
-/* AI每日简报 - 经典报纸风格样式系统 */
+/*────────────────────────────────────────────
+  AI 每日简报 (AI Daily Briefing)
+  经典报纸排版样式系统 · TailwindCSS 4.1 Addon
+  merged from theme-backup & main · 2025-07-14
+────────────────────────────────────────────*/
 
-/* 基础字体和颜色 */
+/*──────── 基础字体 & 颜色体系 ────────*/
 :root {
-  /* 报纸风格颜色系统 */
-  --newspaper-bg: #fdfcfa;
-  --newspaper-text: #1a1a1a;
-  --newspaper-border: #2d3748;
-  --newspaper-accent: #3182ce;
-  --newspaper-shadow: rgba(45, 55, 72, 0.1);
-  
-  /* 字体系统 */
+  color-scheme: light dark;
+
+  /* 报纸色板 · 浅色 */
+  --newspaper-bg:      #fdfcfa;
+  --newspaper-text:    #1a1a1a;
+  --newspaper-border:  #e5e7eb;
+  --newspaper-accent:  #3182ce;
+  --newspaper-shadow:  rgba(45, 55, 72, 0.1);
+
+  /* 间距 */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 0.75rem;
+  --spacing-lg: 1rem;
+  --spacing-xl: 1.5rem;
+  --spacing-2xl: 2rem;
+
+  /* 字体 */
   --font-headline: "Times New Roman", "SimSun", serif;
-  --font-body: "Times New Roman", "SimSun", serif;
-  --font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-body:     "Times New Roman", "SimSun", serif;
+  --font-ui:       -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+  /* 动效变量 */
+  --duration-fast:   0.15s;
+  --duration-normal: 0.25s;
+  --duration-slow:   0.3s;
+  --ease-out:        cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-in-out:     cubic-bezier(0.4, 0, 0.6, 1);
 }
 
-/* 深色模式颜色 */
+/* 深色模式变量（媒体查询 & .dark 双保险） */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --newspaper-bg:     #1a1918;
+    --newspaper-text:   #e8e6e3;
+    --newspaper-border: #d1d5db;
+    --newspaper-accent: #60a5fa;
+    --newspaper-shadow: rgba(209, 213, 219, 0.1);
+  }
+}
 .dark {
-  --newspaper-bg: #1a1918;
-  --newspaper-text: #e8e6e3;
+  --newspaper-bg:     #1a1918;
+  --newspaper-text:   #e8e6e3;
   --newspaper-border: #d1d5db;
   --newspaper-accent: #60a5fa;
   --newspaper-shadow: rgba(209, 213, 219, 0.1);
 }
 
-/* Footer container width fix - ensures footer spans full width */
-footer .hx-max-w-screen-xl {
-  max-width: 100%;
+/* P3 色域增强 */
+@supports (color: color(display-p3 1 0 0)) {
+  :root { --newspaper-accent: color(display-p3 0.2 0.4 0.9); }
+  .dark { --newspaper-accent: color(display-p3 0.4 0.6 1); }
+}
+@supports (color: rgb(from white r g b)) {
+  :root { --newspaper-accent-hover: rgb(from var(--newspaper-accent) r g b / 0.8); }
 }
 
-/* Footer Styles - 保持原有的统计功能样式 */
+/*──────── 正文排版 ────────*/
+.prose {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.625;
+  max-width: 60ch;
+}
+
+/*──────── 页脚 ────────*/
+footer .hx-max-w-screen-xl { max-width: 100%; }
 .footer-wrapper {
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 1.5rem 0.5rem;
-  width: 100%;
 }
-
-.footer-container {
-  text-align: center;
-}
-
+.footer-container { text-align: center; }
 .footer-links {
-  list-style: none;
-  padding: 0;
-  margin: 0;
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
   gap: 1.5rem;
   margin-bottom: 1rem;
   font-size: 0.875rem;
   color: #6b7280;
+  list-style: none;
 }
-
-.footer-links li {
-  display: flex;
-  align-items: center;
-}
-
-.footer-copyright {
-  font-size: 0.875rem;
-  opacity: 0.8;
-  color: #6b7280;
-}
-
 .footer-links a,
 .footer-copyright a {
   color: inherit;
   text-decoration: none;
-  transition: color 0.3s ease;
+  transition: color var(--duration-normal) var(--ease-out);
 }
-
 .footer-links a:hover,
 .footer-copyright a:hover {
   color: #374151;
   text-decoration: underline;
 }
-
-/* Dark mode support for footer */
 .dark .footer-links,
-.dark .footer-copyright {
-  color: #9ca3af;
-}
-
+.dark .footer-copyright { color: #9ca3af; }
 .dark .footer-links a:hover,
-.dark .footer-copyright a:hover {
-  color: #d1d5db;
-}
+.dark .footer-copyright a:hover { color: #d1d5db; }
 
-/* === 日报内容标题优化 === */
-/* 美化日报页面的第一个h2标题（内容中的真实标题） */
+/*──────── 文章页主标题 ────────*/
 .content h2:first-child {
-  /* 报纸主标题样式 */
+  font-family: var(--font-headline);
   font-size: 2.5rem;
   font-weight: 800;
   line-height: 1.2;
-  margin-top: 0;
-  margin-bottom: 2rem;
+  margin: 0 0 2rem;
   padding-bottom: 1rem;
   border-bottom: 4px double #1f2937;
-  font-family: var(--font-headline);
+  text-wrap: balance;
 }
+.dark .content h2:first-child { border-bottom-color: #e5e7eb; }
 
-/* 深色模式适配 */
-.dark .content h2:first-child {
-  border-bottom-color: #e5e7eb;
-}
-
-/* === 日报元信息样式 === */
-/* xAI发布Grok 4引发行业震动 部分添加日期标识 */
-.content h3:first-of-type::before {
-  content: "📅 ";
-  font-size: 1.2em;
-  margin-right: 0.5rem;
-}
-
-/* === 月份索引页优化 === */
-/* 日报列表项美化 */
-.daily-article {
-  position: relative;
-  padding-left: 1.5rem;
-  padding-top: 0.75rem;
-  padding-bottom: 0.75rem;
-  margin-bottom: 0.5rem;
-  border-left: 3px solid #3b82f6;
-  transition: all 0.2s ease;
-}
-
-.daily-article:hover {
-  background-color: rgba(59, 130, 246, 0.05);
-  border-left-width: 5px;
-  padding-left: 1.75rem;
-}
-
-.dark .daily-article:hover {
-  background-color: rgba(59, 130, 246, 0.1);
-}
-
-.daily-article a {
-  color: inherit;
-  text-decoration: none;
-  font-weight: 500;
-}
-
-.daily-article a:hover {
-  color: #3b82f6;
-}
-
-/* === 首页月份卡片样式 === */
+/*──────── 首页月份卡片 ────────*/
 .newspaper-grid > div {
   border: 2px solid #111827;
   padding: 1.5rem;
-  background-color: #ffffff;
+  background: #fff;
   box-shadow: 4px 4px 0 rgb(17 24 39);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
+  transition: transform var(--duration-slow) var(--ease-out),
+              box-shadow var(--duration-slow) var(--ease-out);
 }
-
 .newspaper-grid > div:hover {
   transform: translate(-2px, -2px);
   box-shadow: 6px 6px 0 rgb(17 24 39);
+  will-change: transform;
 }
-
 .dark .newspaper-grid > div {
-  background-color: #111827;
+  background: #111827;
   border-color: #f3f4f6;
   box-shadow: 4px 4px 0 rgb(243 244 246);
 }
-
 .dark .newspaper-grid > div:hover {
   box-shadow: 6px 6px 0 rgb(243 244 246);
 }
-
-/* 卡片内容样式 */
 .newspaper-grid h3 {
+  font-family: var(--font-headline);
   font-size: 1.25rem;
   font-weight: 700;
   margin-bottom: 0.75rem;
-  font-family: var(--font-headline);
-  color: #111827;
 }
+.newspaper-grid a { text-decoration: none; transition: color var(--duration-fast) var(--ease-out); }
+.newspaper-grid a:hover { color: var(--newspaper-accent); }
 
-.dark .newspaper-grid h3 {
-  color: #f3f4f6;
-}
-
-.newspaper-grid a {
-  color: #111827;
-  text-decoration: none;
-  transition: color 0.2s ease;
-}
-
-.dark .newspaper-grid a {
-  color: #f3f4f6;
-}
-
-.newspaper-grid a:hover {
-  color: #3b82f6;
-}
-
-.dark .newspaper-grid a:hover {
-  color: #60a5fa;
-}
-
-.newspaper-grid p {
-  color: #4b5563;
-  font-size: 0.875rem;
-  line-height: 1.625;
-}
-
-.dark .newspaper-grid p {
-  color: #9ca3af;
-}
-
-/* 添加报纸日期标记 */
-.newspaper-grid > div::before {
-  content: "📰";
-  position: absolute;
-  top: -0.5rem;
-  right: -0.5rem;
-  font-size: 1.5rem;
-}
-
-/* 响应式调整 */
-@media (max-width: 768px) {
-  .newspaper-masthead h1 {
-    font-size: 2rem;
-  }
-  
-  .newspaper-masthead .grid {
-    grid-template-columns: 1fr;
-    gap: 0.5rem;
-  }
-  
-  .newspaper-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .content h2:first-child {
-    font-size: 1.875rem;
-  }
-}
-
-/* 月份索引页的文章列表样式 */
-.newspaper-articles-grid > div {
-  border-left: 4px solid #e5e7eb;
-  padding-left: 1.5rem;
-  padding-top: 1rem;
-  padding-bottom: 1rem;
-  margin-bottom: 1rem;
+/*──────── 月份索引 · 日报条目 ────────*/
+.daily-article {
   position: relative;
-  background: linear-gradient(90deg, 
-    rgba(59, 130, 246, 0.02) 0%, 
-    rgba(59, 130, 246, 0.01) 20%, 
-    transparent 100%
-  );
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: var(--spacing-md) 0 var(--spacing-md) var(--spacing-xl);
+  margin-bottom: var(--spacing-sm);
+  border-inline-start: 4px solid var(--newspaper-accent);
+  transition: background-color var(--duration-normal) var(--ease-out),
+              transform        var(--duration-normal) var(--ease-out),
+              box-shadow       var(--duration-normal) var(--ease-out);
 }
-
-.dark .newspaper-articles-grid > div {
-  border-left-color: #4b5563;
-  background: linear-gradient(90deg, 
-    rgba(59, 130, 246, 0.08) 0%, 
-    rgba(59, 130, 246, 0.02) 20%, 
-    transparent 100%
-  );
-}
-
-.newspaper-articles-grid > div:hover {
-  border-left-color: #3b82f6;
-  padding-left: 2rem;
-  background: linear-gradient(90deg, 
-    rgba(59, 130, 246, 0.1) 0%, 
-    rgba(59, 130, 246, 0.03) 30%, 
-    transparent 100%
-  );
+.daily-article:hover {
+  background-color: rgba(59,130,246,0.05);
+  box-shadow: inset 5px 0 0 var(--newspaper-accent), 0 1px 3px rgba(0,0,0,0.1);
   transform: translateX(4px);
+  will-change: transform;
+}
+.daily-article a       { font-weight: 500; }
+.daily-article a:hover { color: var(--newspaper-accent); }
+@media (prefers-color-scheme: dark) {
+  .daily-article:hover {
+    background-color: rgba(59,130,246,0.1);
+    box-shadow: inset 5px 0 0 var(--newspaper-accent), 0 1px 3px rgba(0,0,0,0.2);
+  }
 }
 
-/* 日期标记 */
-.newspaper-articles-grid > div::before {
-  content: "📅";
-  position: absolute;
-  left: -0.5rem;
-  top: 1rem;
-  font-size: 1.125rem;
-  z-index: 1;
+/*──────── 月份索引 · 文章卡片 ────────*/
+.newspaper-articles-grid > div {
+  border-inline-start: 4px solid var(--newspaper-border);
+  padding: 1rem 1rem 1rem 1.5rem;
+  margin-bottom: 1rem;
+  background: linear-gradient(90deg,
+              rgba(49,130,206,0.02) 0%,
+              rgba(49,130,206,0.01) 20%,
+              transparent 100%);
+  transition: border-color var(--duration-slow) var(--ease-out),
+              background   var(--duration-slow) var(--ease-out),
+              transform    var(--duration-slow) var(--ease-out),
+              box-shadow   var(--duration-slow) var(--ease-out);
 }
-
-/* 链接样式 */
+.newspaper-articles-grid > div:hover {
+  border-inline-start-color: var(--newspaper-accent);
+  background: linear-gradient(90deg,
+              rgba(49,130,206,0.10) 0%,
+              rgba(49,130,206,0.03) 30%,
+              transparent 100%);
+  box-shadow: 0 2px 8px rgba(49,130,206,0.15);
+  transform: translateX(8px);
+  will-change: transform;
+}
 .newspaper-articles-grid a {
-  color: #111827;
-  font-weight: 600;
-  font-size: 1.125rem;
-  text-decoration: none;
-  transition: all 0.2s ease;
   display: block;
   font-family: var(--font-headline);
+  font-size: 1.125rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color       var(--duration-fast) var(--ease-out),
+              text-shadow var(--duration-fast) var(--ease-out);
 }
-
-.dark .newspaper-articles-grid a {
-  color: #f3f4f6;
-}
-
 .newspaper-articles-grid a:hover {
-  color: #3b82f6;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  color: var(--newspaper-accent);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.1);
 }
 
-.dark .newspaper-articles-grid a:hover {
-  color: #60a5fa;
+/*──────── 取消入场动画 ────────*/
+.newspaper-articles-grid > div { opacity: 1; animation: none; }
+
+/*──────── 响应式 & 触摸优化 ────────*/
+@media (max-width: 768px) {
+  .newspaper-masthead h1  { font-size: 2rem; }
+  .content h2:first-child { font-size: 1.875rem; }
+
+  .newspaper-grid,
+  .newspaper-masthead .grid { grid-template-columns: 1fr; }
+
+  .daily-article,
+  .newspaper-grid > div,
+  .newspaper-articles-grid > div { transition-duration: var(--duration-fast); }
 }
-
-/* 加载动画 */
-.newspaper-articles-grid > div {
-  opacity: 0;
-  animation: fadeInUp 0.6s ease forwards;
-}
-
-.newspaper-articles-grid > div:nth-child(1) { animation-delay: 0.1s; }
-.newspaper-articles-grid > div:nth-child(2) { animation-delay: 0.2s; }
-.newspaper-articles-grid > div:nth-child(3) { animation-delay: 0.3s; }
-.newspaper-articles-grid > div:nth-child(4) { animation-delay: 0.4s; }
-.newspaper-articles-grid > div:nth-child(5) { animation-delay: 0.5s; }
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+@media (pointer: coarse) {
+  .daily-article a,
+  .newspaper-grid a,
+  .newspaper-articles-grid a {
+    padding: var(--spacing-sm);
+    margin: calc(-1 * var(--spacing-sm));
   }
 }
-
-/* 性能优化 */
-.newspaper-layout * {
-  will-change: auto;
-}
-
-.article-card,
-.newspaper-quote {
-  contain: layout style;
-}
-
-/* 打印样式 */
-@media print {
-  .newspaper-layout {
-    background: white;
-    color: black;
-  }
-  
-  .article-card {
-    box-shadow: none;
-    border: 1px solid black;
-  }
-  
-  .article-card:hover {
-    transform: none;
+@media (hover: none) {
+  .daily-article:focus-within,
+  .newspaper-grid > div:focus-within,
+  .newspaper-articles-grid > div:focus-within {
+    background-color: rgba(59,130,246,0.05);
+    transform: translateX(2px);
   }
 }
 
-/* 辅助功能 */
+/*──────── 无障碍 & 节能 ────────*/
 @media (prefers-reduced-motion: reduce) {
-  .article-card {
-    transition: none;
-  }
-  
-  .article-card:hover {
-    transform: none;
-  }
-  
+  .daily-article,
+  .newspaper-grid > div,
   .newspaper-articles-grid > div {
-    animation: none;
-    opacity: 1;
+    transition: none;
+    transform: none !important;
+    box-shadow: none !important;
   }
 }
+@media (prefers-reduced-transparency: reduce) {
+  .daily-article:hover,
+  .newspaper-grid > div,
+  .newspaper-articles-grid > div:hover { background-image: none; }
+}
+@media (prefers-reduced-data: reduce) {
+  .newspaper-articles-grid > div { background: transparent; }
+}
 
-/* 高对比度模式 */
+/* 高对比 & 强制色模式 */
 @media (prefers-contrast: high) {
   :root {
-    --newspaper-border: #000000;
-    --newspaper-text: #000000;
-    --newspaper-bg: #ffffff;
+    --newspaper-border: #000;
+    --newspaper-text:   #000;
+    --newspaper-bg:     #fff;
+    --newspaper-accent: #0000ee;
   }
-  
   .dark {
-    --newspaper-border: #ffffff;
-    --newspaper-text: #ffffff;
-    --newspaper-bg: #000000;
+    --newspaper-border: #fff;
+    --newspaper-text:   #fff;
+    --newspaper-bg:     #000;
+    --newspaper-accent: #66aaff;
   }
+  .daily-article,
+  .newspaper-grid > div,
+  .newspaper-articles-grid > div { border: 2px solid; }
+}
+@media (forced-colors: active) {
+  .daily-article,
+  .newspaper-grid > div,
+  .newspaper-articles-grid > div {
+    forced-color-adjust: none;
+    border-color: ButtonBorder;
+    background-color: ButtonFace;
+    color: ButtonText;
+  }
+}
+
+/*──────── 容器查询 (渐进增强) ────────*/
+@supports (container-type: inline-size) {
+  .newspaper-grid,
+  .newspaper-articles-grid {
+    container-type: inline-size;
+    container-name: article-grid;
+  }
+  @container article-grid (max-width: 600px) {
+    .newspaper-grid { grid-template-columns: 1fr; }
+    .daily-article,
+    .newspaper-articles-grid > div { padding-inline-start: var(--spacing-lg); }
+  }
+  @container article-grid (min-width: 900px) {
+    .newspaper-grid { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+  }
+}
+
+/*──────── 打印样式 ────────*/
+@media print {
+  .newspaper-layout { background: #fff; color: #000; }
+  .article-card     { box-shadow: none; border: 1px solid #000; }
 }
