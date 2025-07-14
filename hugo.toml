@@ -92,7 +92,7 @@ type = "search"
 [[menu.main]]
 name = "GitHub"
 weight = 10
-url = "https://github.com/YYvanYang/AIHeadline.news-next"
+url = "https://github.com/YYvanYang/AIHeadline.news"
 [menu.main.params]
 icon = "github"
 

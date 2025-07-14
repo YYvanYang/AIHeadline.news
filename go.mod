@@ -1,4 +1,4 @@
-module github.com/YYvanYang/AIHeadline.news-next
+module github.com/YYvanYang/AIHeadline.news
 
 go 1.24.5
 
