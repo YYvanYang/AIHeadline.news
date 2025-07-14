@@ -1,0 +1,18 @@
+# Example .dev.vars file for local development
+# Copy this to .dev.vars and fill in your actual values
+
+# Google Analytics Service Account Key (complete JSON)
+GA4_SERVICE_KEY='{
+  "type": "service_account",
+  "project_id": "your-project-id",
+  "private_key_id": "...",
+  "private_key": "-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n",
+  "client_email": "...",
+  "client_id": "...",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "...",
+  "client_x509_cert_url": "..."
+}'
+
+# Note: GA4_PROPERTY_ID is already defined in wrangler.jsonc
