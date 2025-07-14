@@ -20,7 +20,7 @@ sidebar:
   </div>
 </div>
 
-<div class="newspaper-daily-list mt-12">
+<div class="newspaper-daily-list hx-mt-12">
   <h2 class="text-2xl font-bold mb-6 font-serif flex items-center">
     <span class="mr-3">📰</span>
     本月日报

@@ -110,6 +110,11 @@ npm run dev                       # Test Worker locally
   - CSS files must be in `assets/css/` directory, NOT `static/css/`
   - Hugo processes files in `assets/` for optimization, while `static/` files are just copied
   - Check browser developer tools for CSS conflicts or overrides
+- **Tailwind CSS classes not working**:
+  - **Critical**: This project uses `hx-` prefix for all Tailwind classes
+  - Use `hx-mt-16` instead of `mt-16`, `hx-mb-8` instead of `mb-8`, etc.
+  - Check compiled CSS file (`public/css/compiled/main.css`) to confirm class names
+  - Common mistake: using standard Tailwind class names without the `hx-` prefix
 - **Page content offset issues**: 
   - Avoid modifying article margins or layout-related CSS
   - Hextra theme handles responsive layout automatically
