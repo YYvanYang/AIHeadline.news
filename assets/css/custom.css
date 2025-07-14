@@ -1,0 +1,303 @@
+/* AI每日简报 - 经典报纸风格样式系统 */
+
+/* 基础字体和颜色 */
+:root {
+  /* 报纸风格颜色系统 */
+  --newspaper-bg: #fdfcfa;
+  --newspaper-text: #1a1a1a;
+  --newspaper-border: #2d3748;
+  --newspaper-accent: #3182ce;
+  --newspaper-shadow: rgba(45, 55, 72, 0.1);
+  
+  /* 字体系统 */
+  --font-headline: "Times New Roman", "SimSun", serif;
+  --font-body: "Times New Roman", "SimSun", serif;
+  --font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* 深色模式颜色 */
+.dark {
+  --newspaper-bg: #1a1918;
+  --newspaper-text: #e8e6e3;
+  --newspaper-border: #d1d5db;
+  --newspaper-accent: #60a5fa;
+  --newspaper-shadow: rgba(209, 213, 219, 0.1);
+}
+
+/* Footer container width fix - ensures footer spans full width */
+footer .hx-max-w-screen-xl {
+  max-width: 100%;
+}
+
+/* Footer Styles - 保持原有的统计功能样式 */
+.footer-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1.5rem 0.5rem;
+  width: 100%;
+}
+
+.footer-container {
+  text-align: center;
+}
+
+.footer-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.footer-links li {
+  display: flex;
+  align-items: center;
+}
+
+.footer-copyright {
+  font-size: 0.875rem;
+  opacity: 0.8;
+  color: #6b7280;
+}
+
+.footer-links a,
+.footer-copyright a {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.footer-links a:hover,
+.footer-copyright a:hover {
+  color: #374151;
+  text-decoration: underline;
+}
+
+/* Dark mode support for footer */
+.dark .footer-links,
+.dark .footer-copyright {
+  color: #9ca3af;
+}
+
+.dark .footer-links a:hover,
+.dark .footer-copyright a:hover {
+  color: #d1d5db;
+}
+
+/* 报纸风格基础样式 */
+.newspaper-layout {
+  background-color: var(--newspaper-bg);
+  color: var(--newspaper-text);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* 报纸标题样式 */
+.newspaper-masthead {
+  font-family: var(--font-headline);
+  text-align: center;
+  padding: 2rem 0;
+}
+
+.newspaper-masthead h1 {
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  text-shadow: 2px 2px 4px var(--newspaper-shadow);
+}
+
+/* 经典报纸分栏效果 */
+.newspaper-columns {
+  column-count: 1;
+  column-gap: 2rem;
+  column-rule: 1px solid var(--newspaper-border);
+}
+
+@media (min-width: 768px) {
+  .newspaper-columns {
+    column-count: 2;
+  }
+}
+
+@media (min-width: 1024px) {
+  .newspaper-columns {
+    column-count: 3;
+  }
+}
+
+/* 文章卡片样式 */
+.article-card {
+  background: var(--newspaper-bg);
+  border: 2px solid var(--newspaper-border);
+  box-shadow: 4px 4px 0 var(--newspaper-border);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  break-inside: avoid;
+  margin-bottom: 1.5rem;
+  padding: 1.5rem;
+}
+
+.article-card:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 var(--newspaper-border);
+}
+
+/* 标题层次系统 */
+.headline-primary {
+  font-family: var(--font-headline);
+  font-size: clamp(2rem, 5vw, 4rem);
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  margin-bottom: 1rem;
+}
+
+.headline-secondary {
+  font-family: var(--font-headline);
+  font-size: clamp(1.5rem, 3vw, 2.5rem);
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 0.75rem;
+}
+
+.headline-tertiary {
+  font-family: var(--font-headline);
+  font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+  font-weight: 600;
+  line-height: 1.3;
+  margin-bottom: 0.5rem;
+}
+
+/* 正文样式 */
+.article-body {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.7;
+  text-align: justify;
+  hyphens: auto;
+}
+
+/* 首字母下沉效果 */
+.drop-cap::first-letter {
+  float: left;
+  font-family: var(--font-headline);
+  font-size: 4rem;
+  line-height: 3rem;
+  font-weight: 900;
+  margin-right: 0.5rem;
+  margin-top: 0.25rem;
+  color: var(--newspaper-accent);
+}
+
+/* 引用样式 */
+.newspaper-quote {
+  position: relative;
+  padding-left: 2rem;
+  margin: 2rem 0;
+  font-style: italic;
+  font-family: var(--font-headline);
+  border-left: 4px solid var(--newspaper-accent);
+}
+
+.newspaper-quote::before {
+  content: '"';
+  position: absolute;
+  left: -0.5rem;
+  top: -1rem;
+  font-size: 4rem;
+  color: var(--newspaper-accent);
+  opacity: 0.3;
+  font-family: var(--font-headline);
+}
+
+/* 分隔线样式 */
+.newspaper-divider {
+  margin: 2rem 0;
+  border: none;
+  height: 1px;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 3px,
+    var(--newspaper-border) 3px,
+    var(--newspaper-border) 6px
+  );
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+  .newspaper-columns {
+    column-count: 1;
+  }
+  
+  .article-card {
+    margin-bottom: 1rem;
+    padding: 1rem;
+  }
+  
+  .article-body {
+    text-align: left;
+    hyphens: none;
+  }
+  
+  .drop-cap::first-letter {
+    font-size: 3rem;
+    line-height: 2.5rem;
+  }
+}
+
+/* 性能优化 */
+.newspaper-layout * {
+  will-change: auto;
+}
+
+.article-card,
+.newspaper-quote {
+  contain: layout style;
+}
+
+/* 打印样式 */
+@media print {
+  .newspaper-layout {
+    background: white;
+    color: black;
+  }
+  
+  .article-card {
+    box-shadow: none;
+    border: 1px solid black;
+  }
+  
+  .article-card:hover {
+    transform: none;
+  }
+}
+
+/* 辅助功能 */
+@media (prefers-reduced-motion: reduce) {
+  .article-card {
+    transition: none;
+  }
+  
+  .article-card:hover {
+    transform: none;
+  }
+}
+
+/* 高对比度模式 */
+@media (prefers-contrast: high) {
+  :root {
+    --newspaper-border: #000000;
+    --newspaper-text: #000000;
+    --newspaper-bg: #ffffff;
+  }
+  
+  .dark {
+    --newspaper-border: #ffffff;
+    --newspaper-text: #ffffff;
+    --newspaper-bg: #000000;
+  }
+}
