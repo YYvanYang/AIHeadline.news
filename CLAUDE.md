@@ -56,7 +56,7 @@ npm run dev                       # Test Worker locally
 - `.github/scripts/sync-news.sh` - Content sync script
 - `.github/scripts/test-sync.sh` - Local development script for content sync
 - `.github/templates/` - Templates for dynamic content generation
-- `layouts/partials/custom/footer.html` - Custom footer with stats display
+- `layouts/_partials/custom/footer.html` - Custom footer with stats display (Note: uses new Hugo v0.146.0+ template system)
 
 ### Content Flow
 1. GitHub Actions triggers daily
@@ -83,10 +83,27 @@ npm run dev                       # Test Worker locally
 ### CSS and Styling
 - Place custom CSS in `assets/css/custom.css` (NOT in `static/css/`)
 - Follow Hextra theme conventions for footer customization:
-  - Use `layouts/partials/custom/footer.html` for custom footer content
+  - Use `layouts/_partials/custom/footer.html` for custom footer content (Note: `_partials` with underscore)
   - Disable default footer in `hugo.yaml` with `displayCopyright: false` and `displayPoweredBy: false`
 - Keep CSS minimal and focused on specific customizations
 - Always test responsive design on multiple screen sizes
+
+### Hugo Template System (v0.146.0+ New Template System)
+**Critical Migration Notes (Updated July 2025)**:
+- **Hugo Version**: Upgraded from v0.140.2 to v0.148.1 for consistency across local and GitHub Actions
+- **Partials Directory**: **MUST use `layouts/_partials/` (with underscore)** instead of `layouts/partials/`
+  - ✅ Correct: `layouts/_partials/title-controller.html`
+  - ✅ Correct: `layouts/_partials/custom/footer.html`
+  - ❌ Old/Wrong: `layouts/partials/...`
+- **Template Calls**: Partial calls remain unchanged: `{{ partial "title-controller.html" . }}`
+- **Background**: Hugo v0.146.0 introduced a complete re-implementation of the template system
+- **Documentation**: Refer to [Hugo New Template System](https://gohugo.io/templates/new-templatesystem-overview/)
+
+**Why This Matters**:
+- Old Hugo versions (v0.140.2) used `layouts/partials/`
+- New Hugo versions (v0.146.0+) use `layouts/_partials/`
+- GitHub Actions and local development now both use v0.148.1 for consistency
+- Mixing old/new paths will cause "partial not found" errors during deployment
 
 ### GitHub Actions Security (2025)
 1. **Use v4+ versions**: All actions must use v4 or higher (required after Jan 30, 2025)
@@ -123,6 +140,10 @@ npm run dev                       # Test Worker locally
   - "Could not resolve": Check network connectivity and API endpoints
   - "CLOUDFLARE_API_TOKEN not found": Set both in `with` and `env` for wrangler-action
   - "public directory does not exist": Use independent build in deploy-cf-worker job
+- **Hugo partial template errors** (Fixed July 2025):
+  - "partial not found" errors: Ensure using `layouts/_partials/` directory (new template system)
+  - Version mismatch: Verify both local and GitHub Actions use Hugo v0.148.1+
+  - Migration required: Move files from `layouts/partials/` to `layouts/_partials/`
 - **Wrangler configuration**: Use `wrangler.jsonc` format (Cloudflare recommended)
 
 ### Hugo Template Title Duplication Issue Resolution
@@ -136,7 +157,7 @@ npm run dev                       # Test Worker locally
 - Initially only modified `single.html`, but monthly index pages actually use `list.html`
 
 **Solution**:
-1. **Create shared partial template**: `layouts/_partials/title-controller.html`
+1. **Create shared partial template**: `layouts/_partials/title-controller.html` (Note: uses new Hugo v0.146.0+ `_partials` directory)
    ```go
    {{ partial "title-controller.html" (dict "context" . "pageType" $pageType) }}
    ```
