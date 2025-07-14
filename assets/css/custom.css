@@ -1,21 +1,52 @@
 /* AI每日简报 - 经典报纸风格样式系统 */
 
-/* 基础字体和颜色 */
+/* 基础字体和颜色 - 使用现代 CSS 特性 */
 :root {
-  /* 报纸风格颜色系统 */
+  /* 声明颜色方案支持 */
+  color-scheme: light dark;
+  
+  /* 报纸风格颜色系统 - 浅色模式 */
   --newspaper-bg: #fdfcfa;
   --newspaper-text: #1a1a1a;
-  --newspaper-border: #2d3748;
+  --newspaper-border: #e5e7eb;
   --newspaper-accent: #3182ce;
   --newspaper-shadow: rgba(45, 55, 72, 0.1);
+  
+  /* 间距系统 - 符合 Tailwind 规范 */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 0.75rem;
+  --spacing-lg: 1rem;
+  --spacing-xl: 1.5rem;
+  --spacing-2xl: 2rem;
   
   /* 字体系统 */
   --font-headline: "Times New Roman", "SimSun", serif;
   --font-body: "Times New Roman", "SimSun", serif;
   --font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  
+  /* 动画时长 */
+  --duration-fast: 0.15s;
+  --duration-normal: 0.25s;
+  --duration-slow: 0.3s;
+  
+  /* 缓动函数 */
+  --ease-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.6, 1);
 }
 
 /* 深色模式颜色 */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --newspaper-bg: #1a1918;
+    --newspaper-text: #e8e6e3;
+    --newspaper-border: #d1d5db;
+    --newspaper-accent: #60a5fa;
+    --newspaper-shadow: rgba(209, 213, 219, 0.1);
+  }
+}
+
+/* Hextra dark class 支持 */
 .dark {
   --newspaper-bg: #1a1918;
   --newspaper-text: #e8e6e3;
@@ -121,22 +152,35 @@ footer .hx-max-w-screen-xl {
 /* 日报列表项美化 */
 .daily-article {
   position: relative;
-  padding-left: 1.5rem;
-  padding-top: 0.75rem;
-  padding-bottom: 0.75rem;
-  margin-bottom: 0.5rem;
-  border-left: 3px solid #3b82f6;
-  transition: all 0.2s ease;
+  
+  /* 旧浏览器兼容 - 物理属性作为降级 */
+  padding-left: var(--spacing-xl);
+  padding-top: var(--spacing-md);
+  padding-bottom: var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
+  border-left: 4px solid var(--newspaper-accent);
+  
+  /* 现代浏览器 - 逻辑属性 */
+  padding-inline-start: var(--spacing-xl);
+  padding-block: var(--spacing-md);
+  margin-block-end: var(--spacing-sm);
+  border-inline-start: 4px solid var(--newspaper-accent);
+  
+  /* 性能优化的过渡 */
+  transition: 
+    background-color var(--duration-normal) var(--ease-out),
+    box-shadow var(--duration-normal) var(--ease-out),
+    transform var(--duration-normal) var(--ease-out);
 }
 
 .daily-article:hover {
   background-color: rgba(59, 130, 246, 0.05);
-  border-left-width: 5px;
-  padding-left: 1.75rem;
-}
-
-.dark .daily-article:hover {
-  background-color: rgba(59, 130, 246, 0.1);
+  /* 使用 box-shadow 模拟更宽的边框，避免布局重排 */
+  box-shadow: 
+    inset 5px 0 0 var(--newspaper-accent),
+    0 1px 3px rgba(0, 0, 0, 0.1);
+  /* 使用 transform 进行位移，性能更好 */
+  transform: translateX(4px);
 }
 
 .daily-article a {
@@ -146,7 +190,24 @@ footer .hx-max-w-screen-xl {
 }
 
 .daily-article a:hover {
-  color: #3b82f6;
+  color: var(--newspaper-accent);
+}
+
+/* 深色模式特定调整 */
+@media (prefers-color-scheme: dark) {
+  .daily-article:hover {
+    background-color: rgba(59, 130, 246, 0.1);
+    box-shadow: 
+      inset 5px 0 0 var(--newspaper-accent),
+      0 1px 3px rgba(0, 0, 0, 0.2);
+  }
+}
+
+.dark .daily-article:hover {
+  background-color: rgba(59, 130, 246, 0.1);
+  box-shadow: 
+    inset 5px 0 0 var(--newspaper-accent),
+    0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 /* === 首页月份卡片样式 === */
@@ -155,7 +216,10 @@ footer .hx-max-w-screen-xl {
   padding: 1.5rem;
   background-color: #ffffff;
   box-shadow: 4px 4px 0 rgb(17 24 39);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  /* 只过渡需要的属性，提升性能 */
+  transition: 
+    transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
 }
 
@@ -198,11 +262,7 @@ footer .hx-max-w-screen-xl {
 }
 
 .newspaper-grid a:hover {
-  color: #3b82f6;
-}
-
-.dark .newspaper-grid a:hover {
-  color: #60a5fa;
+  color: var(--newspaper-accent);
 }
 
 .newspaper-grid p {
@@ -224,7 +284,7 @@ footer .hx-max-w-screen-xl {
   font-size: 1.5rem;
 }
 
-/* 响应式调整 */
+/* 响应式调整 - v4.1 增强 */
 @media (max-width: 768px) {
   .newspaper-masthead h1 {
     font-size: 2rem;
@@ -242,42 +302,89 @@ footer .hx-max-w-screen-xl {
   .content h2:first-child {
     font-size: 1.875rem;
   }
+  
+  /* 移动设备上减少动画 */
+  .daily-article,
+  .newspaper-grid > div,
+  .newspaper-articles-grid > div {
+    transition-duration: var(--duration-fast);
+  }
+}
+
+/* v4.1 新特性 - 指针设备检测 */
+@media (pointer: coarse) {
+  /* 触摸设备上增大点击区域 */
+  .daily-article a,
+  .newspaper-grid a,
+  .newspaper-articles-grid a {
+    padding: var(--spacing-sm);
+    margin: calc(var(--spacing-sm) * -1);
+  }
+}
+
+
+
+@media (hover: none) {
+  /* 触摸设备上禁用 hover 效果，使用 focus 替代 */
+  .daily-article:focus-within,
+  .newspaper-grid > div:focus-within,
+  .newspaper-articles-grid > div:focus-within {
+    background-color: rgba(59, 130, 246, 0.05);
+    transform: translateX(2px);
+  }
 }
 
 /* 月份索引页的文章列表样式 */
 .newspaper-articles-grid > div {
-  border-left: 4px solid #e5e7eb;
+  border-left: 4px solid var(--newspaper-border);
   padding-left: 1.5rem;
   padding-top: 1rem;
   padding-bottom: 1rem;
   margin-bottom: 1rem;
   position: relative;
   background: linear-gradient(90deg, 
-    rgba(59, 130, 246, 0.02) 0%, 
-    rgba(59, 130, 246, 0.01) 20%, 
+    rgba(49, 130, 206, 0.02) 0%, 
+    rgba(49, 130, 206, 0.01) 20%, 
     transparent 100%
   );
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  /* 优化过渡效果，避免使用 all */
+  transition: 
+    border-left-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    background 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.dark .newspaper-articles-grid > div {
-  border-left-color: #4b5563;
-  background: linear-gradient(90deg, 
-    rgba(59, 130, 246, 0.08) 0%, 
-    rgba(59, 130, 246, 0.02) 20%, 
-    transparent 100%
-  );
-}
+
 
 .newspaper-articles-grid > div:hover {
-  border-left-color: #3b82f6;
-  padding-left: 2rem;
+  border-left-color: var(--newspaper-accent);
   background: linear-gradient(90deg, 
-    rgba(59, 130, 246, 0.1) 0%, 
-    rgba(59, 130, 246, 0.03) 30%, 
+    rgba(49, 130, 206, 0.1) 0%, 
+    rgba(49, 130, 206, 0.03) 30%, 
     transparent 100%
   );
-  transform: translateX(4px);
+  box-shadow: 0 2px 8px rgba(49, 130, 206, 0.15);
+  /* 使用 transform 替代 padding 变化，避免布局重排 */
+  transform: translateX(8px);
+}
+
+/* 深色主题专用背景和阴影 */
+.dark .newspaper-articles-grid > div {
+  background: linear-gradient(90deg, 
+    rgba(96, 165, 250, 0.02) 0%, 
+    rgba(96, 165, 250, 0.01) 20%, 
+    transparent 100%
+  );
+}
+
+.dark .newspaper-articles-grid > div:hover {
+  background: linear-gradient(90deg, 
+    rgba(96, 165, 250, 0.1) 0%, 
+    rgba(96, 165, 250, 0.03) 30%, 
+    transparent 100%
+  );
+  box-shadow: 0 2px 8px rgba(96, 165, 250, 0.15);
 }
 
 /* 日期标记 */
@@ -296,7 +403,10 @@ footer .hx-max-w-screen-xl {
   font-weight: 600;
   font-size: 1.125rem;
   text-decoration: none;
-  transition: all 0.2s ease;
+  /* 只过渡需要的属性 */
+  transition: 
+    color var(--duration-fast) var(--ease-out),
+    text-shadow var(--duration-fast) var(--ease-out);
   display: block;
   font-family: var(--font-headline);
 }
@@ -306,13 +416,13 @@ footer .hx-max-w-screen-xl {
 }
 
 .newspaper-articles-grid a:hover {
-  color: #3b82f6;
+  color: var(--newspaper-accent);
+  /* v4.1 新特性 - 使用现代 text-shadow，降级为透明 */
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
-.dark .newspaper-articles-grid a:hover {
-  color: #60a5fa;
-}
+
+
 
 /* 加载动画 */
 .newspaper-articles-grid > div {
@@ -347,6 +457,28 @@ footer .hx-max-w-screen-xl {
   contain: layout style;
 }
 
+/* 为动画元素启用硬件加速 - 符合 v4.1 兼容性要求 */
+.daily-article,
+.newspaper-grid > div,
+.newspaper-articles-grid > div {
+  /* 启用 GPU 加速，但避免过度优化 */
+  transform: translateZ(0);
+}
+
+/* 优化渲染性能 - 只在必要时设置 will-change */
+.daily-article:hover,
+.newspaper-grid > div:hover,
+.newspaper-articles-grid > div:hover {
+  will-change: transform;
+}
+
+/* 动画结束后清理 will-change */
+.daily-article,
+.newspaper-grid > div,
+.newspaper-articles-grid > div {
+  will-change: auto;
+}
+
 /* 打印样式 */
 @media print {
   .newspaper-layout {
@@ -364,19 +496,54 @@ footer .hx-max-w-screen-xl {
   }
 }
 
-/* 辅助功能 */
+/* 辅助功能 - v4.1 增强 */
 @media (prefers-reduced-motion: reduce) {
-  .article-card {
+  .article-card,
+  .daily-article,
+  .newspaper-grid > div,
+  .newspaper-articles-grid > div {
     transition: none;
+    animation: none;
+    opacity: 1;
   }
   
-  .article-card:hover {
+  .article-card:hover,
+  .daily-article:hover,
+  .newspaper-grid > div:hover,
+  .newspaper-articles-grid > div:hover {
     transform: none;
+    box-shadow: none;
   }
   
+  /* 保持颜色变化，因为它们不会引起眩晕 */
+  .daily-article a:hover,
+  .newspaper-grid a:hover,
+  .newspaper-articles-grid a:hover {
+    color: var(--newspaper-accent);
+    transition: color var(--duration-fast) ease;
+  }
+}
+
+/* v4.1 新特性 - 透明度偏好支持 */
+@media (prefers-reduced-transparency: reduce) {
+  .daily-article:hover,
+  .newspaper-grid > div,
+  .newspaper-articles-grid > div:hover {
+    background-color: var(--newspaper-accent);
+    background-image: none;
+  }
+}
+
+/* 数据节省模式 */
+@media (prefers-reduced-data: reduce) {
   .newspaper-articles-grid > div {
     animation: none;
     opacity: 1;
+  }
+  
+  /* 简化渐变为纯色 */
+  .newspaper-articles-grid > div {
+    background: transparent;
   }
 }
 
@@ -386,11 +553,80 @@ footer .hx-max-w-screen-xl {
     --newspaper-border: #000000;
     --newspaper-text: #000000;
     --newspaper-bg: #ffffff;
+    --newspaper-accent: #0000ee;
   }
   
   .dark {
     --newspaper-border: #ffffff;
     --newspaper-text: #ffffff;
     --newspaper-bg: #000000;
+    --newspaper-accent: #66aaff;
+  }
+  
+  /* 确保边框和焦点状态在高对比度模式下可见 */
+  .daily-article,
+  .newspaper-grid > div,
+  .newspaper-articles-grid > div {
+    border: 2px solid;
+  }
+}
+
+/* 强制颜色模式支持 */
+@media (forced-colors: active) {
+  .daily-article,
+  .newspaper-grid > div,
+  .newspaper-articles-grid > div {
+    forced-color-adjust: none;
+    border-color: ButtonBorder;
+    background-color: ButtonFace;
+    color: ButtonText;
+  }
+}
+
+/* 现代浏览器特性检测 - v4.1 兼容性优化 */
+@supports (color: color(display-p3 1 0 0)) {
+  :root {
+    /* 使用 P3 色域，兼容性更好 */
+    --newspaper-accent: color(display-p3 0.2 0.4 0.9);
+  }
+  
+  .dark {
+    --newspaper-accent: color(display-p3 0.4 0.6 1);
+  }
+}
+
+/* CSS 相对颜色语法支持 */
+@supports (color: rgb(from white r g b)) {
+  :root {
+    /* 使用相对颜色调整透明度 */
+    --newspaper-accent-hover: rgb(from var(--newspaper-accent) r g b / 0.8);
+  }
+}
+
+/* v4.1 增强 - 容器查询支持 */
+@supports (container-type: inline-size) {
+  .newspaper-grid,
+  .newspaper-articles-grid {
+    container-type: inline-size;
+    container-name: article-grid;
+  }
+  
+  /* 响应式网格调整 */
+  @container article-grid (max-width: 600px) {
+    .newspaper-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .daily-article,
+    .newspaper-articles-grid > div {
+      padding-left: var(--spacing-lg);
+      padding-inline-start: var(--spacing-lg);
+    }
+  }
+  
+  @container article-grid (min-width: 900px) {
+    .newspaper-grid {
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    }
   }
 }

@@ -49,12 +49,10 @@ cascade:
 </div>
 
 <style>
-/* 报纸风格卡片样式 */
+/* 报纸风格卡片样式 - 基础样式在 custom.css 中定义 */
 .newspaper-grid > div {
   @apply border-2 border-gray-900 dark:border-gray-100 p-6 bg-white dark:bg-gray-900;
-  box-shadow: 4px 4px 0 rgb(17 24 39);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
+  /* box-shadow 和 transition 在 custom.css 中定义 */
 }
 
 .newspaper-grid > div:hover {

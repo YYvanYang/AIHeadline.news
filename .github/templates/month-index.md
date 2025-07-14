@@ -35,55 +35,7 @@ sidebar:
 </div>
 
 <style>
-/* 报纸风格日报列表 */
-.newspaper-articles-grid > div {
-  @apply border-l-4 border-gray-300 dark:border-gray-600 pl-6 py-4 mb-4 relative;
-  background: linear-gradient(90deg, 
-    rgba(59, 130, 246, 0.02) 0%, 
-    rgba(59, 130, 246, 0.01) 20%, 
-    transparent 100%
-  );
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-}
-
-.dark .newspaper-articles-grid > div {
-  background: linear-gradient(90deg, 
-    rgba(59, 130, 246, 0.08) 0%, 
-    rgba(59, 130, 246, 0.02) 20%, 
-    transparent 100%
-  );
-}
-
-.newspaper-articles-grid > div:hover {
-  @apply border-l-4 border-blue-600 pl-8;
-  background: linear-gradient(90deg, 
-    rgba(59, 130, 246, 0.1) 0%, 
-    rgba(59, 130, 246, 0.03) 30%, 
-    transparent 100%
-  );
-  transform: translateX(4px);
-}
-
-/* 日期标记 */
-.newspaper-articles-grid > div::before {
-  content: "📅";
-  @apply absolute -left-2 top-4 text-lg;
-  z-index: 1;
-}
-
-/* 链接样式 */
-.newspaper-articles-grid a {
-  @apply text-gray-900 dark:text-gray-100 font-semibold text-lg no-underline;
-  transition: all 0.2s ease;
-  display: block;
-  font-family: 'Times New Roman', serif;
-}
-
-.newspaper-articles-grid a:hover {
-  @apply text-blue-600 dark:text-blue-400;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-}
+/* 模板特定样式 - 主要样式在 custom.css 中定义 */
 
 /* 添加期刊样式的编号 */
 .newspaper-articles-grid > div {
