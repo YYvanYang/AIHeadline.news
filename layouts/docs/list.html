@@ -10,8 +10,8 @@
           {{ $pageType := "normal" }}
           {{ if .File }}
             {{ $path := .File.Path }}
-            {{ if findRE `\d{4}-\d{2}/\d{4}-\d{2}-\d{2}\.md$` $path }}
-              {{ $pageType = "daily" }}
+            {{ if findRE `\d{4}-\d{2}/_index\.md$` $path }}
+              {{ $pageType = "monthIndex" }}
             {{ end }}
           {{ end }}
           
@@ -26,4 +26,4 @@
       </main>
     </article>
   </div>
-{{ end }}
+{{ end }} 

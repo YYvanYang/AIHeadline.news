@@ -119,3 +119,37 @@ npm run dev                       # Test Worker locally
   - "CLOUDFLARE_API_TOKEN not found": Set both in `with` and `env` for wrangler-action
   - "public directory does not exist": Use independent build in deploy-cf-worker job
 - **Wrangler configuration**: Use `wrangler.jsonc` format (Cloudflare recommended)
+
+### Hugo Template Title Duplication Issue Resolution
+
+**Problem Description**: Monthly pages (e.g., `/2025-07/`) showed duplicate titles, displaying both "2025-07" and "2025年07月"
+
+**Root Cause**: 
+- Different page types use different Hugo templates:
+  - `_index.md` (month indexes) → `layouts/docs/list.html`
+  - Single page files → `layouts/docs/single.html`
+- Initially only modified `single.html`, but monthly index pages actually use `list.html`
+
+**Solution**:
+1. **Create shared partial template**: `layouts/_partials/title-controller.html`
+   ```go
+   {{ partial "title-controller.html" (dict "context" . "pageType" $pageType) }}
+   ```
+2. **Intelligent page type detection**:
+   - `"daily"`: Daily briefing pages (`\d{4}-\d{2}/\d{4}-\d{2}-\d{2}\.md$`)
+   - `"monthIndex"`: Monthly index pages (`\d{4}-\d{2}/_index\.md$`)
+   - `"normal"`: Regular pages
+3. **Unified template logic**: Ensure `single.html` and `list.html` use consistent conditional logic
+
+**Key Lessons Learned**:
+- ✅ **Identify page type first**: Confirm which Hugo template the current page uses (list vs single)
+- ✅ **Consult official documentation**: Use Context7 to query Hugo best practices, learn about partial templates
+- ✅ **Prioritize code reuse**: Create shared partials to avoid duplicate logic and improve maintainability
+- ✅ **Follow proper test workflow**: Must re-run `test-sync.sh` after template modifications to regenerate content
+- ✅ **Standardize logic patterns**: Conditional checks for same functionality should maintain consistent order and style
+- ❌ **Never manually edit content directory**: Auto-generated files in `content/` should never be manually modified
+
+**Debugging Techniques**:
+- Use `curl` commands to test page HTML structure: `curl -s http://localhost:1313/2025-07/ | grep "<h1"`
+- Add debug comments to confirm template usage: `<!-- DEBUG: list.html template -->`
+- Monitor Hugo server logs for template recompilation messages

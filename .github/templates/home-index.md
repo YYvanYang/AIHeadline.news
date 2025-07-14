@@ -38,7 +38,7 @@ cascade:
   </div>
 </div>
 
-<div class="newspaper-archive">
+<div class="newspaper-archive mt-8">
   <h2 class="text-3xl font-bold mb-8 text-center font-serif border-b-2 border-gray-900 dark:border-gray-100 pb-4">
     📅 历史日报档案
   </h2>
