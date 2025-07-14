@@ -3,7 +3,7 @@
 # 
 # 功能：从ai-news-vault仓库同步markdown文件并生成Hugo站点内容
 # 作者：AI每日简报团队
-# 版本：2.1 - 增强错误处理
+# 版本：2.2 - 修复算术运算导致的退出问题
 
 set -euo pipefail
 
@@ -15,9 +15,6 @@ readonly PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 readonly SOURCE_DIR="${PROJECT_ROOT}/source-news/summaries"
 readonly CONTENT_DIR="${PROJECT_ROOT}/content"
 readonly TEMPLATE_DIR="${PROJECT_ROOT}/.github/templates"
-
-# 临时文件前缀
-readonly TEMP_PREFIX="${CONTENT_DIR}/.tmp_sync"
 
 # =============================================================================
 # 工具函数
@@ -35,18 +32,13 @@ die() {
     exit 1
 }
 
-# 清理临时文件 - 增强错误处理
+# 清理临时文件
 cleanup_temp_files() {
     log "Cleaning up temporary files..."
     
-    # 安全的清理方式，避免权限问题
     if [[ -d "$CONTENT_DIR" ]]; then
-        # 使用更安全的清理方式
-        find "$CONTENT_DIR" -name ".tmp_sync*" -type f 2>/dev/null | while IFS= read -r file; do
-            if [[ -w "$file" ]]; then
-                rm -f "$file" || log "WARN: Failed to remove temp file: $file"
-            fi
-        done
+        find "$CONTENT_DIR" -name ".tmp_sync*" -type f -delete 2>/dev/null || true
+        find "$CONTENT_DIR" -name ".*_tmp" -type f -delete 2>/dev/null || true
     fi
     
     log "Temporary files cleanup completed"
@@ -152,7 +144,7 @@ FILE_EOF
             filename="$(basename "$file")"
             
             # 提取时间戳 (HHMMSS)
-            if [[ "$filename" =~ summary_[0-9]{8}_([0-9]{6})\.md$ ]]; then
+            if [[ "$filename" =~ summary_[0-9]{8}_([0-9]{6])\.md$ ]]; then
                 local timestamp="${BASH_REMATCH[1]}"
                 local hour="${timestamp:0:2}"
                 local minute="${timestamp:2:2}"
@@ -215,14 +207,13 @@ CONTENT_EOF
     log "Generated month index: ${dest_dir}/_index.md"
 }
 
-# 生成首页 - 增强错误处理
+# 生成首页
 generate_home_page() {
     log "Starting home page generation..."
     
     local template_file="${TEMPLATE_DIR}/home-index.md"
     [[ -f "$template_file" ]] || die "Home template not found: $template_file"
     
-    local temp_file="${CONTENT_DIR}/.home_tmp"
     local cards_file="${CONTENT_DIR}/.cards_tmp"
     
     # 收集月份卡片
@@ -248,7 +239,8 @@ generate_home_page() {
   <p>收录 ${article_count} 篇AI日报，涵盖技术突破、产业动态、投资并购等关键资讯</p>
 </div>
 CARD_EOF
-        ((month_count++))
+        # 修复：使用安全的递增方式
+        month_count=$((month_count + 1))
     done
     
     # 如果没有数据，显示提示
@@ -348,7 +340,8 @@ sync_content() {
             }
             
             process_month "$month_dir" "$year" "$month"
-            ((total_months++))
+            # 修复：使用安全的递增方式，避免在set -e模式下退出
+            total_months=$((total_months + 1))
         done
     done
     
@@ -363,10 +356,12 @@ sync_content() {
     log "Synchronization complete: $total_files files generated"
     
     # 列出生成的文件（限制输出）
-    log "Generated files:"
-    find "$CONTENT_DIR" -name "*.md" -type f | sort | head -10
-    if [[ $total_files -gt 10 ]]; then
-        log "... and $((total_files - 10)) more files"
+    if [[ $total_files -gt 0 ]]; then
+        log "Generated files:"
+        find "$CONTENT_DIR" -name "*.md" -type f | sort | head -10
+        if [[ $total_files -gt 10 ]]; then
+            log "... and $((total_files - 10)) more files"
+        fi
     fi
 }
 
@@ -375,7 +370,7 @@ sync_content() {
 # =============================================================================
 
 main() {
-    log "AI News Content Sync v2.1"
+    log "AI News Content Sync v2.2"
     log "Project root: $PROJECT_ROOT"
     log "Source directory: $SOURCE_DIR"
     log "Content directory: $CONTENT_DIR"
