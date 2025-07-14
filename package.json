@@ -4,8 +4,10 @@
   "private": true,
   "description": "AI Headlines - Your AI Intelligence Station",
   "scripts": {
-    "dev": "wrangler dev --assets ./public",
-    "deploy": "wrangler deploy"
+    "deploy": "wrangler deploy",
+		"dev": "wrangler dev",
+		"start": "wrangler dev",
+		"cf-typegen": "wrangler types"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250712.0",

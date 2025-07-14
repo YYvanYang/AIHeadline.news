@@ -2,7 +2,6 @@
   "name": "aiheadline-news",
   "main": "_worker.ts",
   "compatibility_date": "2025-07-13",
-  "compatibility_flags": ["nodejs_compat"],
   "assets": {
     "directory": "./public",
     "binding": "ASSETS",

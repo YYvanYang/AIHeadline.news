@@ -74,7 +74,6 @@ assets/css/custom.css            # 自定义样式
   "name": "aiheadline-news",
   "main": "_worker.ts",
   "compatibility_date": "2025-07-13",
-  "compatibility_flags": ["nodejs_compat"],  // 可选：提供 Node.js 兼容性
   "assets": {
     "directory": "./public",
     "binding": "ASSETS",
@@ -93,8 +92,9 @@ assets/css/custom.css            # 自定义样式
 
 **重要说明**：
 - 使用 `wrangler.jsonc` 格式（Cloudflare 推荐）
-- `nodejs_compat` 提供额外的 Node.js API 兼容性
+- 项目采用 Web 标准 API 设计，无需 `nodejs_compat` 兼容性标志
 - Worker 使用 WebCrypto API 自签名 JWT，无需外部 SDK（参考 [WebCrypto API 文档][cf-webcrypto]）
+- 基于 Web 标准实现，bundle 更轻量，性能更优
 
 ### 2.2 Worker 实现技术说明
 
