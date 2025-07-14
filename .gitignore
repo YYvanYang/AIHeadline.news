@@ -1,7 +1,40 @@
-# Hugo output
-public/
-resources/
+# Hugo default output directory
+/public/
+/resources/_gen/
+
+# Hugo lock files
 .hugo_build.lock
 
-# Editor
+# Dynamically generated content
+/content/
+!/content/.gitkeep
+
+# Local development files
+/test-source/
+/source-news/
+/screenshots/
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
 .vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Node modules
+node_modules/
+
+# Wrangler
+.wrangler/
+.dev.vars
+
+# Root markdown files (except documentation)
+/*.md
+!CLAUDE.md
+!README.md
+
