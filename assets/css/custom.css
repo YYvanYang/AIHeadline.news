@@ -91,10 +91,8 @@ footer .hx-max-w-screen-xl {
 }
 
 /* === 日报内容标题优化 === */
-/* 针对日报页面的第一个h2标题进行美化 */
-article[data-page-path*="2025-"] h2:first-of-type,
-article[data-page-path*="2026-"] h2:first-of-type,
-article[data-page-path*="2027-"] h2:first-of-type {
+/* 美化日报页面的第一个h2标题（内容中的真实标题） */
+.content h2:first-child {
   /* 报纸主标题样式 */
   font-size: 2.5rem;
   font-weight: 800;
@@ -107,17 +105,13 @@ article[data-page-path*="2027-"] h2:first-of-type {
 }
 
 /* 深色模式适配 */
-.dark article[data-page-path*="2025-"] h2:first-of-type,
-.dark article[data-page-path*="2026-"] h2:first-of-type,
-.dark article[data-page-path*="2027-"] h2:first-of-type {
+.dark .content h2:first-child {
   border-bottom-color: #e5e7eb;
 }
 
 /* === 日报元信息样式 === */
 /* xAI发布Grok 4引发行业震动 部分添加日期标识 */
-article[data-page-path*="2025-"] h3:first-of-type::before,
-article[data-page-path*="2026-"] h3:first-of-type::before,
-article[data-page-path*="2027-"] h3:first-of-type::before {
+.content h3:first-of-type::before {
   content: "📅 ";
   font-size: 1.2em;
   margin-right: 0.5rem;
@@ -245,9 +239,7 @@ article[data-page-path*="2027-"] h3:first-of-type::before {
     grid-template-columns: 1fr;
   }
   
-  article[data-page-path*="2025-"] h2:first-of-type,
-  article[data-page-path*="2026-"] h2:first-of-type,
-  article[data-page-path*="2027-"] h2:first-of-type {
+  .content h2:first-child {
     font-size: 1.875rem;
   }
 }
