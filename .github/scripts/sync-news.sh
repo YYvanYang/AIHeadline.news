@@ -3,7 +3,7 @@
 # 
 # 功能：从ai-news-vault仓库同步markdown文件并生成Hugo站点内容
 # 作者：AI每日简报团队
-# 版本：2.0
+# 版本：2.1 - 增强错误处理
 
 set -euo pipefail
 
@@ -35,10 +35,21 @@ die() {
     exit 1
 }
 
-# 清理临时文件
+# 清理临时文件 - 增强错误处理
 cleanup_temp_files() {
     log "Cleaning up temporary files..."
-    find "${CONTENT_DIR}" -name "${TEMP_PREFIX##*/}*" -type f -delete 2>/dev/null || true
+    
+    # 安全的清理方式，避免权限问题
+    if [[ -d "$CONTENT_DIR" ]]; then
+        # 使用更安全的清理方式
+        find "$CONTENT_DIR" -name ".tmp_sync*" -type f 2>/dev/null | while IFS= read -r file; do
+            if [[ -w "$file" ]]; then
+                rm -f "$file" || log "WARN: Failed to remove temp file: $file"
+            fi
+        done
+    fi
+    
+    log "Temporary files cleanup completed"
 }
 
 # 设置清理陷阱
@@ -176,8 +187,8 @@ generate_month_index() {
     local template_file="${TEMPLATE_DIR}/month-index.md"
     [[ -f "$template_file" ]] || die "Template not found: $template_file"
     
-    local temp_file="${TEMP_PREFIX}_month_${year}_${month}"
-    local content_file="${temp_file}_content"
+    local temp_file="${dest_dir}/.month_index_tmp"
+    local content_file="${dest_dir}/.content_tmp"
     
     # 生成内容列表
     : > "$content_file"
@@ -198,16 +209,21 @@ CONTENT_EOF
     sed "/{{CONTENT}}/r $content_file" "$temp_file" | \
         sed '/{{CONTENT}}/d' > "${dest_dir}/_index.md"
     
+    # 清理临时文件
+    rm -f "$temp_file" "$content_file"
+    
     log "Generated month index: ${dest_dir}/_index.md"
 }
 
-# 生成首页
+# 生成首页 - 增强错误处理
 generate_home_page() {
+    log "Starting home page generation..."
+    
     local template_file="${TEMPLATE_DIR}/home-index.md"
     [[ -f "$template_file" ]] || die "Home template not found: $template_file"
     
-    local temp_file="${TEMP_PREFIX}_home"
-    local cards_file="${temp_file}_cards"
+    local temp_file="${CONTENT_DIR}/.home_tmp"
+    local cards_file="${CONTENT_DIR}/.cards_tmp"
     
     # 收集月份卡片
     : > "$cards_file"
@@ -246,10 +262,15 @@ NO_DATA_EOF
     fi
     
     # 生成首页
-    sed "/{{MONTH_CARDS}}/r $cards_file" "$template_file" | \
-        sed '/{{MONTH_CARDS}}/d' > "${CONTENT_DIR}/_index.md"
+    if sed "/{{MONTH_CARDS}}/r $cards_file" "$template_file" | \
+        sed '/{{MONTH_CARDS}}/d' > "${CONTENT_DIR}/_index.md"; then
+        log "Generated home page with $month_count months"
+    else
+        die "Failed to generate home page"
+    fi
     
-    log "Generated home page with $month_count months"
+    # 清理临时文件
+    rm -f "$cards_file"
 }
 
 # =============================================================================
@@ -280,7 +301,7 @@ process_month() {
     
     # 生成每日页面
     for date_str in "${dates[@]}"; do
-        generate_daily_page "$month_dir" "$dest_dir" "$date_str"
+        generate_daily_page "$month_dir" "$dest_dir" "$date_str" || log "WARN: Failed to generate page for $date_str"
     done
     
     # 生成月份索引
@@ -338,7 +359,7 @@ sync_content() {
     
     # 显示同步结果
     local total_files
-    total_files=$(find "$CONTENT_DIR" -name "*.md" -type f | wc -l)
+    total_files=$(find "$CONTENT_DIR" -name "*.md" -type f 2>/dev/null | wc -l)
     log "Synchronization complete: $total_files files generated"
     
     # 列出生成的文件（限制输出）
@@ -354,7 +375,7 @@ sync_content() {
 # =============================================================================
 
 main() {
-    log "AI News Content Sync v2.0"
+    log "AI News Content Sync v2.1"
     log "Project root: $PROJECT_ROOT"
     log "Source directory: $SOURCE_DIR"
     log "Content directory: $CONTENT_DIR"
