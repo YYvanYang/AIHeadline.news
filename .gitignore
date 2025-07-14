@@ -5,6 +5,9 @@
 # Hugo lock files
 .hugo_build.lock
 
+# Hugo generated files
+hugo_stats.json
+
 # Dynamically generated content
 /content/
 !/content/.gitkeep
