@@ -9,10 +9,10 @@ cascade:
 
 <div class="newspaper-masthead border-b-4 border-double border-gray-900 dark:border-gray-100 pb-8 mb-12">
   <div class="text-center">
-    <h1 class="text-5xl md:text-6xl font-bold mb-4 font-serif text-gray-900 dark:text-gray-100">
+    <h1 class="page-title text-5xl md:text-6xl font-bold mb-4 font-serif text-gray-900 dark:text-gray-100">
       AI每日简报
     </h1>
-    <div class="text-lg md:text-xl text-gray-600 dark:text-gray-400 italic mb-4">
+    <div class="sub-head-en text-lg md:text-xl text-gray-600 dark:text-gray-400 italic mb-4">
       ARTIFICIAL INTELLIGENCE DAILY BRIEFING
     </div>
     <div class="max-w-4xl mx-auto">
@@ -39,7 +39,7 @@ cascade:
 </div>
 
 <div class="newspaper-archive hx-mt-12">
-  <h2 class="text-3xl font-bold mb-8 text-center font-serif border-b-2 border-gray-900 dark:border-gray-100 pb-4">
+  <h2 class="section-title text-3xl font-bold mb-8 text-center font-serif border-b-2 border-gray-900 dark:border-gray-100 pb-4">
     📅 历史日报档案
   </h2>
   

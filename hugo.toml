@@ -78,7 +78,7 @@ enable = false
 # 主菜单配置
 [[menu.main]]
 identifier = "documentation"
-name = "AI日报"
+name = "首页"
 pageRef = "/"
 weight = 1
 
