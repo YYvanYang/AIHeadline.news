@@ -1,13 +1,22 @@
 #!/usr/bin/env bash
-set -e                        # 任一命令出错立即退出
-mkdir -p out                  # 若无 out 文件夹则创建
+# resize_logos.sh  ——  批量把 *.png 缩放裁剪成 350×100，保留透明度
+set -euo pipefail
+shopt -s nullglob            # 若无匹配文件，*.png 展开为空，而非字面字符串
+
+mkdir -p out
+
 for f in *.png; do
-  name="${f%.*}"              # 去掉扩展名，如 big-1
+  name="${f%.*}"             # 去掉扩展名
+
   magick "$f" \
     -resize 350x100^ \
+    -background none -alpha set \
     -gravity center \
     -extent 350x100 \
     -strip \
-    "out/${name}-350x100.png" # 存到 out/ 并带新尺寸后缀
+    "out/${name}-350x100.png"
+
+  echo "✅  $f  →  out/${name}-350x100.png"
 done
-echo "✅ 处理完毕，结果在 $(pwd)/out/"
+
+echo "🚀  全部完成（共 $(ls out | wc -l) 个文件）"
