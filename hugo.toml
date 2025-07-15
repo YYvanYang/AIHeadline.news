@@ -101,7 +101,7 @@ name = "Telegram"
 weight = 11
 url = "https://t.me/ai_daily_briefing"
 [menu.main.params]
-icon = "chat"
+icon = "telegram"
 
 [[menu.main]]
 name = "RSS"
