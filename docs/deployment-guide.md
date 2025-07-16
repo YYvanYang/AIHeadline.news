@@ -11,15 +11,48 @@
 
 ## 架构总览
 
+本项目采用双重部署架构，通过单一 GitHub Actions 工作流实现两个独立的部署目标：
+
+- **主要生产环境**：Cloudflare Workers + Assets (aiheadline.news)
+- **备份镜像环境**：GitHub Pages (yyvanyang.github.io/AIHeadline.news)
+
+### 部署流程图
+
 ```mermaid
-graph LR
-  A[git push / cron] --> B[build<br>Hugo → public/]
-  B --> C[upload artifact]
-  C --> D[deploy-gh-pages]
-  C --> E[deploy-cf-worker<br>wrangler deploy]
-  D --> F[(GitHub Pages<br>镜像)]
-  E --> G[(Cloudflare Worker + Assets<br>aiheadline.news)]
+graph TB
+  A[触发器: git push / cron / manual] --> B[Job 1: build]
+  B --> B1[同步内容<br>ai-news-vault → content/]
+  B1 --> B2[Hugo 构建<br>content/ → public/]
+  B2 --> B3[上传 Pages Artifact<br>public/ → GitHub]
+  
+  B3 --> C[Job 2: deploy-gh-pages]
+  C --> C1[(GitHub Pages<br>备份镜像)]
+  
+  B --> D[Job 3: deploy-cf-worker]
+  D --> D1[独立同步内容]
+  D1 --> D2[独立 Hugo 构建<br>→ public/]
+  D2 --> D3[Wrangler 部署<br>public/ → CF Workers]
+  D3 --> D4[(Cloudflare Workers<br>主要生产环境)]
+  
+  style B fill:#e1f5fe
+  style C fill:#f3e5f5
+  style D fill:#fff3e0
+  style C1 fill:#f3e5f5
+  style D4 fill:#fff3e0
 ```
+
+### 独立构建策略
+
+两个部署目标采用完全独立的构建过程：
+
+1. **GitHub Pages 构建**：在 `build` 作业中完成，构建产物通过 GitHub Pages artifact 机制传递
+2. **Cloudflare Workers 构建**：在 `deploy-cf-worker` 作业中独立执行完整的内容同步和构建流程
+
+这种设计确保：
+- 两个部署环境完全隔离，互不影响
+- 每个环境都有完整的构建上下文
+- 部署失败不会相互影响
+- 可以独立调试和优化每个部署流程
 
 ---
 
@@ -59,17 +92,73 @@ graph LR
 ## 2. 代码结构
 
 ```
-/_worker.ts           # Worker 脚本（包含 JWT 自签名实现）
-wrangler.jsonc        # Assets 绑定配置（推荐格式）
-layouts/partials/custom/footer.html   # 包含统计显示
-hugo.yaml             # GA4 Measurement ID, baseURL
-.github/workflows/deploy.yml     # CI/CD 工作流
-assets/css/custom.css            # 自定义样式
+├── _worker.ts                           # Worker 脚本（包含 JWT 自签名实现）
+├── wrangler.jsonc                       # Assets 绑定配置（推荐格式）
+├── hugo.toml                            # GA4 Measurement ID, baseURL
+├── go.mod                               # Hugo 模块依赖
+├── go.sum                               # Go 模块校验和
+├── package.json                         # npm 依赖和脚本
+├── package-lock.json                    # npm 锁定文件
+├── tsconfig.json                        # TypeScript 配置
+├── .dev.vars.example                    # 本地环境变量示例
+├── .editorconfig                        # 编辑器配置
+├── .prettierrc                          # Prettier 格式化配置
+├── .gitignore                           # Git 忽略文件
+├── README.md                            # 项目说明文档
+├── LICENSE                              # 许可证文件
+├── archetypes/
+│   └── default.md                       # Hugo 内容模板
+├── layouts/
+│   ├── _partials/
+│   │   ├── custom/
+│   │   │   └── footer.html              # 包含统计显示的自定义页脚
+│   │   └── title-controller.html        # 标题控制器
+│   ├── docs/
+│   │   ├── list.html                    # 文档列表页面模板
+│   │   └── single.html                  # 文档单页模板
+│   ├── index.rss.xml                    # 首页 RSS 模板
+│   └── section.rss.xml                  # 分类 RSS 模板
+├── assets/
+│   └── css/
+│       └── custom.css                   # 自定义样式（Hugo 处理）
+├── static/
+│   ├── images/
+│   │   ├── light-logo-350x100.webp      # 浅色主题 Logo
+│   │   ├── light-logo-350x100.png       # 浅色主题 Logo (PNG)
+│   │   ├── dark-logo-350x100.webp       # 深色主题 Logo
+│   │   ├── dark-logo-350x100.png        # 深色主题 Logo (PNG)
+│   │   ├── logo.svg                     # SVG Logo
+│   │   ├── logo-dark.svg                # 深色 SVG Logo
+│   │   └── logo-original.png            # 原始 Logo
+│   ├── favicon.ico                      # 网站图标
+│   ├── favicon.svg                      # SVG 图标
+│   └── apple-touch-icon.png             # Apple 触摸图标
+├── logos/                               # Logo 源文件目录
+│   ├── dark-logo.png                    # 深色 Logo 源文件
+│   ├── light-logo.png                   # 浅色 Logo 源文件
+│   ├── resize_logos.sh                  # Logo 调整脚本
+│   └── out/                             # Logo 输出目录
+├── docs/
+│   └── deployment-guide.md              # 部署指南文档
+├── .github/
+│   ├── workflows/
+│   │   └── deploy.yml                   # CI/CD 工作流
+│   ├── scripts/
+│   │   ├── sync-news.sh                 # 内容同步脚本
+│   │   ├── test-sync.sh                 # 测试同步脚本
+│   │   ├── dev.sh                       # 开发脚本
+│   │   └── post-deploy-setup.sh         # 部署后设置脚本
+│   ├── templates/
+│   │   ├── home-index.md                # 首页模板
+│   │   └── month-index.md               # 月份页面模板
+│   └── dependabot.yml                   # Dependabot 配置
+├── content/                             # Markdown 内容（自动生成，请勿手动编辑）
+└── public/                              # Hugo 构建输出（自动生成）
 ```
 
 ### 2.1 `wrangler.jsonc`
 
-```json
+```jsonc
 {
   "name": "aiheadline-news",
   "main": "_worker.ts",
@@ -81,11 +170,11 @@ assets/css/custom.css            # 自定义样式
     "not_found_handling": "404-page"
   },
   "observability": {
-    "enabled": true,                      // 启用日志
-    "head_sampling_rate": 1.0            // 记录所有请求（可调整为 0-1 之间的值）
+    "enabled": true,
+    "head_sampling_rate": 1.0
   },
   "vars": {
-    "GA4_PROPERTY_ID": "496539516"       // GA4 属性 ID（不需要在 Dashboard 中配置）
+    "GA4_PROPERTY_ID": "496539516"
   }
 }
 ```
@@ -96,7 +185,50 @@ assets/css/custom.css            # 自定义样式
 - Worker 使用 WebCrypto API 自签名 JWT，无需外部 SDK（参考 [WebCrypto API 文档][cf-webcrypto]）
 - 基于 Web 标准实现，bundle 更轻量，性能更优
 
-### 2.2 Worker 实现技术说明
+### 2.2 `hugo.toml` 关键配置
+
+```toml
+# AI每日简报 - Hugo 站点配置
+baseURL = "https://aiheadline.news/"
+title = "AI每日简报 - 您的人工智能情报站"
+languageCode = "zh-cn"
+enableRobotsTXT = true
+enableGitInfo = false
+enableEmoji = true
+hasCJKLanguage = true
+
+# Hugo 模块配置
+[module]
+[[module.imports]]
+path = "github.com/imfing/hextra"
+
+# 站点参数
+[params]
+description = "精选全球AI突破性进展：大模型发布、技术突破、产业应用、投融资事件、学术前沿。每日定时更新，3分钟速览AI界大事。"
+
+# 导航栏配置
+[params.navbar]
+displayTitle = false
+displayLogo = true
+
+[params.navbar.logo]
+path = "images/light-logo-350x100.webp"
+dark = "images/dark-logo-350x100.webp"
+width = 175
+height = 50
+
+# 页脚配置
+[params.footer]
+enable = true
+displayCopyright = false
+displayPoweredBy = false
+
+# Google Analytics 配置
+[services.googleAnalytics]
+ID = "G-0DRRQBXZWN"
+```
+
+### 2.3 Worker 实现技术说明
 
 **JWT 自签名流程**：
 1. 使用 Service Account 的私钥通过 WebCrypto API 生成 JWT
@@ -108,43 +240,63 @@ assets/css/custom.css            # 自定义样式
 - [GA4 Data API REST][ga4-api] - API 端点和请求格式
 - [Workers WebCrypto][cf-webcrypto] - RSA 签名实现
 
-### 2.3 GitHub Actions 配置
+### 2.4 GitHub Actions 配置
 
 **重要更新（2025年1月）**：
 - 所有 GitHub Actions 必须升级到 v4 版本
+- Hugo 版本使用 0.148.1
 - Cloudflare Worker 部署采用独立构建方案
 
-完整的 `deploy.yml` 工作流结构：
+完整的 `Deploy AI News to Cloudflare & GitHub Pages` 工作流结构：
+
+**工作流触发器**：
+- 定时触发：每天 UTC 0点（北京时间8点）
+- 手动触发：workflow_dispatch
+- 推送触发：main 分支推送时
+
+**三个作业结构及依赖关系**：
 
 ```yaml
 jobs:
-  # 1. 构建任务 - 为 GitHub Pages 准备
+  # 1. 构建任务 - 为 GitHub Pages 准备构建产物
   build:
     runs-on: ubuntu-24.04
+    env:
+      HUGO_VERSION: 0.148.1
     steps:
-      - uses: actions/checkout@v4              # 必须使用 v4
-      - uses: actions/configure-pages@v5       # 最新版本
-      - uses: actions/upload-pages-artifact@v3 # Pages 专用，保持 v3
+      - name: Install Hugo CLI                 # 安装 Hugo 0.148.1
+      - uses: actions/checkout@v4              # 检出网站代码
+      - uses: actions/checkout@v4              # 检出私有新闻源仓库
+      - name: Sync markdown files              # 同步内容到 content/
+      - uses: actions/configure-pages@v5       # 配置 GitHub Pages
+      - name: Build with Hugo                  # Hugo 构建到 public/
+      - uses: actions/upload-pages-artifact@v3 # 上传构建产物
 
-  # 2. GitHub Pages 部署
+  # 2. GitHub Pages 部署 - 依赖 build 作业
   deploy-gh-pages:
-    needs: build
+    needs: build                               # 等待 build 作业完成
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/deploy-pages@v4          # 必须使用 v4
+      - uses: actions/deploy-pages@v4          # 部署到 GitHub Pages
 
-  # 3. Cloudflare Worker 部署 - 独立构建
+  # 3. Cloudflare Worker 部署 - 完全独立的构建流程
   deploy-cf-worker:
     runs-on: ubuntu-24.04
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main'        # 仅在 main 分支执行
+    env:
+      HUGO_VERSION: 0.148.1
     steps:
-      # 重新构建站点
-      - uses: actions/checkout@v4
-      - name: Build with Hugo
-        run: hugo --gc --minify
-      
-      # 部署到 Cloudflare
-      - uses: cloudflare/wrangler-action@v3
+      - uses: actions/checkout@v4              # 独立检出代码
+      - name: Install Hugo CLI                 # 独立安装 Hugo
+      - uses: actions/checkout@v4              # 独立检出新闻源
+      - name: Sync markdown files              # 独立同步内容
+      - name: Build with Hugo                  # 独立构建到 public/
+      - uses: actions/setup-node@v4            # 设置 Node.js 环境
+      - name: Install dependencies             # 安装 npm 依赖
+      - uses: cloudflare/wrangler-action@v3    # 部署到 Cloudflare
         with:
           apiToken: ${{ secrets.CF_API_TOKEN }}
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
@@ -152,6 +304,44 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
 ```
+
+### 作业依赖关系说明
+
+- **build** 作业：独立运行，为 GitHub Pages 准备构建产物
+- **deploy-gh-pages** 作业：依赖 `build` 作业完成，使用其构建产物进行部署
+- **deploy-cf-worker** 作业：完全独立运行，不依赖其他作业，执行完整的构建和部署流程
+
+### 独立构建的优势
+
+1. **隔离性**：两个部署环境完全隔离，一个失败不影响另一个
+2. **并行性**：`build` 和 `deploy-cf-worker` 可以并行执行，提高效率
+3. **可靠性**：每个环境都有完整的构建上下文，避免依赖问题
+4. **调试性**：可以独立调试和优化每个部署流程
+
+### 部署产物处理机制
+
+#### GitHub Pages 部署产物流程
+
+1. **构建阶段**：`build` 作业执行 Hugo 构建，生成 `public/` 目录
+2. **产物上传**：使用 `actions/upload-pages-artifact@v3` 将 `public/` 目录打包上传
+3. **产物传递**：GitHub Pages artifact 机制自动传递构建产物到部署作业
+4. **部署阶段**：`deploy-gh-pages` 作业使用 `actions/deploy-pages@v4` 部署产物
+
+#### Cloudflare Workers 部署产物流程
+
+1. **独立构建**：`deploy-cf-worker` 作业独立执行完整的内容同步和 Hugo 构建
+2. **本地产物**：在作业运行环境中直接生成 `public/` 目录
+3. **Assets 绑定**：Wrangler 直接读取本地 `public/` 目录内容
+4. **Worker 部署**：通过 Assets 绑定将 `public/` 目录内容部署到 Cloudflare Workers
+
+#### `public/` 目录的双重用途
+
+- **静态文件服务**：包含 Hugo 生成的所有静态文件（HTML、CSS、JS、图片等）
+- **Assets 绑定源**：Cloudflare Workers 通过 Assets 绑定直接服务这些文件
+- **Pages 部署源**：GitHub Pages 直接托管这些静态文件
+- **统一构建输出**：两个部署目标使用相同的构建产物，确保一致性
+
+这种设计确保两个部署环境提供完全相同的用户体验，同时保持部署流程的独立性和可靠性。
 
 ---
 
@@ -223,9 +413,12 @@ wrangler secret put GA4_SERVICE_KEY
    cp .dev.vars.example .dev.vars
    # 编辑 .dev.vars 文件，填入实际的 GA4_SERVICE_KEY
    
+   # 同步最新内容（可选）
+   bash .github/scripts/sync-news.sh
+   
    # 构建和测试
    hugo --gc --minify
-   wrangler dev --assets ./public
+   npm run dev
    # 浏览 http://127.0.0.1:8787/
    ```
 
@@ -258,7 +451,7 @@ wrangler secret put GA4_SERVICE_KEY
 如需手动触发部署：
 
 1. 进入仓库的 **Actions** 页面
-2. 选择 `Deploy AI News to GitHub Pages` 工作流
+2. 选择 `Deploy AI News to Cloudflare & GitHub Pages` 工作流
 3. 点击 **Run workflow** 按钮
 4. 选择 `main` 分支并运行
 
@@ -273,63 +466,140 @@ wrangler secret put GA4_SERVICE_KEY
    - 特别注意 "Sync markdown files" 步骤
 
 2. **常见错误**：
-   - `set -euo pipefail` 相关错误：检查脚本中的管道命令
-   - 权限错误：确认 `PERSONAL_ACCESS_TOKEN` 配置正确
-   - Hugo 构建错误：检查模板语法和内容格式
+   - `set -euo pipefail` 相关错误：检查 `sync-news.sh` 脚本中的管道命令
+   - 权限错误：确认 `PERSONAL_ACCESS_TOKEN` 配置正确且有访问私有 vault 仓库权限
+   - Hugo 构建错误：检查模板语法和内容格式，确认 Hugo 版本为 0.148.1
    - Cloudflare 部署错误：
-     - **"CLOUDFLARE_API_TOKEN environment variable" 错误**：检查 secrets 配置
-     - **"Could not resolve" 错误**：检查网络连接和 API 端点
-     - **"public directory does not exist" 错误**：使用独立构建方案
+     - **"CLOUDFLARE_API_TOKEN environment variable" 错误**：检查 `CF_API_TOKEN` 和 `CF_ACCOUNT_ID` secrets 配置
+     - **"Could not resolve" 错误**：检查网络连接和 Cloudflare API 端点
+     - **"public directory does not exist" 错误**：确认独立构建方案正确执行 `hugo --gc --minify`
+     - **"wrangler-action authentication" 错误**：确认 secrets 同时在 `with` 和 `env` 中配置
 
 ### Stats API 返回 500 错误
 
 1. **检查错误日志**：
-   - Cloudflare Dashboard → Workers → Logs
-   - 查看具体错误信息
+   - Cloudflare Dashboard → Workers → aiheadline-news → Logs
+   - 查看具体错误信息和堆栈跟踪
 
 2. **常见原因**：
    - **"Missing required environment variables"**：
-     - 检查 `GA4_SERVICE_KEY` 是否已通过 Dashboard/CLI 配置
-     - 确认 `wrangler.jsonc` 中有 `GA4_PROPERTY_ID` 配置
-   - **JWT 签名错误**：检查 Service Account JSON 格式（参考 [JWT 认证文档][google-jwt]）
-   - **API 权限错误**：确认 Service Account 有 GA4 只读权限（参考 [GA4 Data API 文档][ga4-api]）
+     - 检查 `GA4_SERVICE_KEY` 是否已通过 Cloudflare Dashboard 或 `wrangler secret put` 配置
+     - 确认 `wrangler.jsonc` 中有 `GA4_PROPERTY_ID: "496539516"` 配置
+   - **JWT 签名错误**：检查 Service Account JSON 格式，确保私钥格式正确（参考 [JWT 认证文档][google-jwt]）
+   - **API 权限错误**：确认 Service Account 有 GA4 Data API 只读权限（参考 [GA4 Data API 文档][ga4-api]）
+   - **WebCrypto API 错误**：检查 RSA 私钥导入和签名过程
 
 ### 内容未更新
 
 1. **验证源数据**：
-   - 确认源仓库有 `.md` 文件（不处理 HTML/PDF）
-   - 检查文件命名格式是否正确
-   - 确认文件在正确的年月目录下
+   - 确认 ai-news-vault 仓库有新的 `.md` 文件（不处理 HTML/PDF）
+   - 检查文件命名格式是否符合年月目录结构
+   - 确认文件在正确的年月目录下且包含有效的 frontmatter
 
 2. **查看同步日志**：
-   - Actions 中查看 "Sync markdown files" 输出
-   - 确认找到并处理了预期的文件
+   - Actions 中查看 "Sync markdown files" 步骤输出
+   - 确认 `sync-news.sh` 脚本找到并处理了预期的文件
+   - 检查是否有文件被跳过或过滤
 
 ### 页面 404 错误
 
-1. 确认部署已完成
-2. 检查 URL 是否正确（注意大小写）
-3. 对于 Cloudflare Workers，检查路由配置
-4. 对于 GitHub Pages，确认 `gh-pages` 分支存在
+1. 确认双重部署都已完成（GitHub Pages 和 Cloudflare Workers）
+2. 检查 URL 是否正确（注意大小写和路径格式）
+3. 对于 Cloudflare Workers：
+   - 检查自定义域名路由配置 (aiheadline.news)
+   - 确认 Assets 绑定指向正确的 `public/` 目录
+4. 对于 GitHub Pages：
+   - 确认 `gh-pages` 分支存在且包含构建文件
+   - 检查 Pages 设置中的源分支配置
+
+### 本地开发问题
+
+1. **环境变量配置**：
+   ```bash
+   # 复制环境变量模板
+   cp .dev.vars.example .dev.vars
+   # 编辑 .dev.vars，填入完整的 GA4_SERVICE_KEY JSON
+   ```
+
+2. **Hugo 服务器问题**：
+   ```bash
+   # 确认 Hugo 版本
+   hugo version
+   # 应显示 v0.148.1 或更高版本
+   
+   # 清理缓存重新构建
+   hugo --gc --minify
+   ```
+
+3. **Wrangler 开发服务器问题**：
+   ```bash
+   # 检查 Node.js 版本（需要 18+）
+   node --version
+   
+   # 重新安装依赖
+   rm -rf node_modules package-lock.json
+   npm install
+   
+   # 启动开发服务器
+   npm run dev
+   ```
 
 ### 调试技巧
 
-1. **本地测试同步**：
+1. **本地测试内容同步**：
    ```bash
-   # 使用 test-sync.sh 脚本测试内容同步
-   ./.github/scripts/test-sync.sh
+   # 使用实际的同步脚本测试
+   bash .github/scripts/sync-news.sh
+   
+   # 测试同步脚本（用于开发环境）
+   bash .github/scripts/test-sync.sh
    ```
 
-2. **本地预览**：
+2. **本地预览和构建**：
    ```bash
-   hugo server
+   # Hugo 开发服务器（实时重载）
+   hugo server --buildDrafts --buildFuture
    # 访问 http://localhost:1313 查看效果
+   
+   # 生产构建测试
+   hugo --gc --minify
+   # 检查 public/ 目录内容
    ```
 
-3. **测试 Worker**：
+3. **Worker 本地测试**：
    ```bash
+   # 安装依赖（首次运行）
+   npm ci
+   
+   # 启动 Wrangler 开发服务器
+   npm run dev
+   # 或者直接使用 wrangler 命令
    wrangler dev --assets ./public
    # 访问 http://127.0.0.1:8787 测试 Worker
+   
+   # 测试 Stats API 端点
+   curl http://127.0.0.1:8787/stats
+   ```
+
+4. **环境变量调试**：
+   ```bash
+   # 检查本地环境变量
+   wrangler dev --var GA4_PROPERTY_ID:496539516
+   
+   # 验证 Secret 配置（生产环境）
+   wrangler secret list
+   ```
+
+5. **部署前验证**：
+   ```bash
+   # 验证 wrangler 配置
+   wrangler deploy --dry-run
+   
+   # 检查构建输出
+   ls -la public/
+   
+   # 验证 Hugo 配置
+   hugo config
    ```
 
 ---
@@ -337,9 +607,9 @@ wrangler secret put GA4_SERVICE_KEY
 ## 注意事项
 
 1. **CSS 文件位置**：必须放在 `assets/css/` 目录，不是 `static/css/`
-2. **页脚自定义**：使用 `layouts/partials/custom/footer.html`，并在 `hugo.yaml` 中禁用默认页脚
+2. **页脚自定义**：使用 `layouts/_partials/custom/footer.html`，并在 `hugo.toml` 中禁用默认页脚
 3. **内容管理**：永远不要手动编辑 `content/` 目录下的文件
-4. **本地开发**：使用 `.github/scripts/test-sync.sh` 同步最新内容
+4. **本地开发**：使用 `.github/scripts/sync-news.sh` 同步最新内容
 5. **域名配置**：Cloudflare Workers 通过路由绑定域名，无需 CNAME 文件
 6. **Wrangler 版本**：项目使用 Wrangler v4，确保 `package.json` 中版本正确
 7. **Actions 版本**：2025 年 1 月 30 日后必须使用 v4 版本
@@ -356,7 +626,7 @@ wrangler secret put GA4_SERVICE_KEY
 
 2. **Wrangler 配置**：
    - 从 `wrangler.toml` 迁移到 `wrangler.jsonc`
-   - 添加 `nodejs_compat` 兼容性标志（可选）
+   - 移除 `nodejs_compat` 兼容性标志（使用 Web 标准 API）
    - 升级到 Wrangler v4.24.3
 
 3. **Worker 实现优化**：
