@@ -42,8 +42,8 @@ displayTitle = false
 displayLogo = true
 
 [params.navbar.logo]
-path = "images/light-logo-350x100.png"
-dark = "images/dark-logo-350x100.png"
+path = "images/light-logo-350x100.webp"
+dark = "images/dark-logo-350x100.webp"
 width = 175
 height = 50
 
