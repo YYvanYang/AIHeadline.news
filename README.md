@@ -33,6 +33,18 @@
 
 ## 本地开发
 
+### 环境配置
+
+Worker 本地开发需要配置 GA4 服务账号密钥：
+
+1. 创建 `.dev.vars` 文件（已在 `.gitignore` 中）
+2. 添加 GA4 服务账号 JSON（保持单行格式）：
+   ```
+   GA4_SERVICE_KEY={"type":"service_account","project_id":"...","private_key":"-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n","client_email":"...@....iam.gserviceaccount.com",...}
+   ```
+
+### 开发命令
+
 ```bash
 # 同步最新内容
 bash .github/scripts/test-sync.sh
@@ -43,7 +55,7 @@ hugo server
 # 构建站点
 hugo --gc --minify
 
-# 启动 Edge 模拟（需先 npm ci）
+# 启动 Worker 开发服务器（需先 npm ci）
 npm run dev
 ```
 

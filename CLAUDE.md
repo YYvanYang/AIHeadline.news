@@ -30,6 +30,15 @@ npm run dev                       # Test Worker locally
 - This script is required for local testing but should NOT be run in production
 - The script will clone/update the source repository and regenerate all content
 
+### Worker Local Development Configuration
+- Create `.dev.vars` file for local environment variables (already in `.gitignore`)
+- Add GA4 service account key in **single-line JSON format**:
+  ```
+  GA4_SERVICE_KEY={"type":"service_account","project_id":"...","private_key":"-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n",...}
+  ```
+- Common error: Multi-line JSON will cause "Expected property name or '}' in JSON at position 1" error
+- The service account must have "Viewer" role in GA4 property settings
+
 ## Project Overview
 
 **AI News Hugo Site** - Automated daily AI news aggregation site
