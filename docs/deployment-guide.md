@@ -85,7 +85,8 @@ assets/css/custom.css            # 自定义样式
     "head_sampling_rate": 1.0            // 记录所有请求（可调整为 0-1 之间的值）
   },
   "vars": {
-    "GA4_PROPERTY_ID": "496539516"       // GA4 属性 ID（不需要在 Dashboard 中配置）
+    "GA4_PROPERTY_ID": "496539516",      // GA4 属性 ID（不需要在 Dashboard 中配置）
+    "GA_START_DATE": "2025-07-12"        // 统计开始日期（站点上线日）
   }
 }
 ```
@@ -285,14 +286,18 @@ wrangler secret put GA4_SERVICE_KEY
 
 1. **检查错误日志**：
    - Cloudflare Dashboard → Workers → Logs
-   - 查看具体错误信息
+   - 查看具体错误信息（现在是结构化 JSON 日志）
 
 2. **常见原因**：
    - **"Missing required environment variables"**：
      - 检查 `GA4_SERVICE_KEY` 是否已通过 Dashboard/CLI 配置
-     - 确认 `wrangler.jsonc` 中有 `GA4_PROPERTY_ID` 配置
+     - 确认 `wrangler.jsonc` 中有 `GA4_PROPERTY_ID` 和 `GA_START_DATE` 配置
    - **JWT 签名错误**：检查 Service Account JSON 格式（参考 [JWT 认证文档][google-jwt]）
    - **API 权限错误**：确认 Service Account 有 GA4 只读权限（参考 [GA4 Data API 文档][ga4-api]）
+   - **配额耗尽（429 错误）**：
+     - 检查响应头 `X-GA-Quota-Warning`
+     - 查看日志中的 `tokensRemaining` 字段
+     - 系统会自动延长缓存时间以减少 API 调用
 
 ### 内容未更新
 
@@ -348,6 +353,26 @@ wrangler secret put GA4_SERVICE_KEY
 
 ## 更新日志
 
+### 2025-07-18 代码质量优化
+1. **Google Analytics API 优化**：
+   - 修复 Realtime API 响应处理（只使用 rows，不使用 totals）
+   - 添加配额监控（returnPropertyQuota: true）
+   - 实现动态缓存策略（根据配额自动调整缓存时间）
+   - 增强错误处理（QuotaExceededError 类）
+   - 添加结构化日志和性能监控
+
+2. **代码健壮性提升**：
+   - 修复请求去重内存泄漏风险（添加时间戳和定期清理）
+   - 添加请求超时控制（GA4 API 30秒，Token 交换 15秒）
+   - 修复网络错误无限重试问题
+   - 改进 GA4 响应验证（validateGA4Response）
+   - 修复大型 ArrayBuffer 转换（分块处理避免栈溢出）
+
+3. **TypeScript 最佳实践**：
+   - 使用泛型替代 any（LogContext<T>）
+   - 完善类型定义和类型守卫
+   - 添加响应结构验证
+
 ### 2025-07-13 重要更新
 1. **GitHub Actions 升级**：
    - 所有 actions 升级到 v4/v5 版本
@@ -366,7 +391,7 @@ wrangler secret put GA4_SERVICE_KEY
    - 改进 CORS 和错误处理
    - 完整实现参考：[Service Account JWT][google-jwt] 和 [GA4 API][ga4-api]
 
-3. **认证修复**：
+4. **认证修复**：
    - wrangler-action 需要同时在 `with` 和 `env` 中设置认证信息
    - 添加了详细的 Token 创建步骤
 

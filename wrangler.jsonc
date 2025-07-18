@@ -13,6 +13,7 @@
     "head_sampling_rate": 1.0
   },
   "vars": {
-    "GA4_PROPERTY_ID": "496539516"
+    "GA4_PROPERTY_ID": "496539516",
+    "GA_START_DATE": "2025-07-12"
   }
 }
