@@ -1,0 +1,39 @@
+Favicon 文件使用说明
+==================
+
+HTML 头部引用示例：
+<!-- 基础 favicon -->
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
+<!-- 标准尺寸 -->
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+
+<!-- Android Chrome -->
+<link rel="icon" type="image/png" sizes="192x192" href="/android-chrome-192x192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="/android-chrome-512x512.png">
+
+<!-- WebP 现代格式（可选） -->
+<link rel="icon" type="image/webp" sizes="16x16" href="/favicon-16x16.webp">
+<link rel="icon" type="image/webp" sizes="32x32" href="/favicon-32x32.webp">
+
+Web App Manifest 示例：
+{
+  "icons": [
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
+
+生成时间: 2025年 7月25日 星期五 09时58分31秒 CST
+源文件: ChatGPT Image 2025年7月25日 09_54_38.png
