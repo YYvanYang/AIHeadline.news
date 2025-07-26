@@ -23,15 +23,19 @@ cascade:
         </div>
         <div class="flex items-center justify-center">
           <span class="mr-2">📊</span>
-          智能聚类算法，相关事件自动归组，条理清晰
+          智能内容筛选，权威源头精准过滤，确保信息质量
         </div>
         <div class="flex items-center justify-center">
           <span class="mr-2">⚡</span>
-          每日定时更新，3分钟速览AI界大事
+          每日自动更新，Claude AI生成专业摘要解读
         </div>
         <div class="flex items-center justify-center">
           <span class="mr-2">🔗</span>
-          原始链接+专业解读，信息可追溯
+          原始推文链接+AI分析，信息完整可追溯
+        </div>
+        <div class="flex items-center justify-center">
+          <span class="mr-2">💡</span>
+          支持事件聚类分析，相关内容智能归组
         </div>
       </div>
     </div>

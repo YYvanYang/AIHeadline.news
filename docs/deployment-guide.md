@@ -205,7 +205,7 @@ path = "github.com/imfing/hextra"
 
 # 站点参数
 [params]
-description = "精选全球AI突破性进展：大模型发布、技术突破、产业应用、投融资事件、学术前沿。每日定时更新，3分钟速览AI界大事。"
+description = "精选全球AI突破性进展：大模型发布、技术突破、产业应用、投融资事件、学术前沿。智能内容筛选，权威源头精准过滤，确保信息质量。每日自动更新，Claude AI生成专业摘要解读。"
 
 # 导航栏配置
 [params.navbar]
