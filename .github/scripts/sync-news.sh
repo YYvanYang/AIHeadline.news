@@ -56,10 +56,10 @@ validate_date() {
     local month="${date_str:4:2}"
     local day="${date_str:6:2}"
     
-    # 基本范围检查
+    # 基本范围检查 - 使用10#前缀强制十进制解析
     [[ "$year" -ge 2020 && "$year" -le 2030 ]] || return 1
-    [[ "$month" -ge 01 && "$month" -le 12 ]] || return 1
-    [[ "$day" -ge 01 && "$day" -le 31 ]] || return 1
+    [[ $((10#$month)) -ge 1 && $((10#$month)) -le 12 ]] || return 1
+    [[ $((10#$day)) -ge 1 && $((10#$day)) -le 31 ]] || return 1
     
     return 0
 }
