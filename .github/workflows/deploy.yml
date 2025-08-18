@@ -40,14 +40,14 @@ jobs:
       
       # 步骤2: 检出网站代码仓库
       - name: Checkout website repo
-        uses: actions/checkout@v4  # 使用 v4 标签
+        uses: actions/checkout@v5  # 使用 v4 标签
         with:
           submodules: recursive
           fetch-depth: 0
 
       # 步骤3: 检出新闻源仓库
       - name: Checkout news source repo
-        uses: actions/checkout@v4  # 使用 v4 标签
+        uses: actions/checkout@v5  # 使用 v4 标签
         with:
           repository: 'YYvanYang/ai-news-vault'
           path: 'source-news'
@@ -102,7 +102,7 @@ jobs:
     steps:
       # 步骤1: 检出代码
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: recursive
           fetch-depth: 0
@@ -115,7 +115,7 @@ jobs:
 
       # 步骤3: 检出新闻源仓库
       - name: Checkout news source repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: 'YYvanYang/ai-news-vault'
           path: 'source-news'
